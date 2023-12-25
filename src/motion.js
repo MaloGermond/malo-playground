@@ -12,10 +12,11 @@ const motion = (function() {
    * @param {Object} obj - JS Object subject of the animation
    * @param {Object} values - Attibutes value to reach. - {a:value, b:value,...}
    * @param {Int} duration - in ms
-   * @param {String} ease - Ease animation
-   * @param {Function} Callback - Function execute when animation ends
+   * @param {Object} option - Animation settings (ease, callback)
    */
-  function to(obj, values, duration, ease, callback) {
+  function to(obj, values, duration, option) {
+
+    option == undefined ? option = "" : ""
 
     // We need to spread the startValue from the original object to get a absolute starting value. Without this changing end value will change also start value. Because both of same have same refence.
     const output = {
@@ -24,8 +25,8 @@ const motion = (function() {
       endValue: values,
       duration: (duration * getTargetFrameRate()) / 1000,
       subject: obj,
-      ease: ease,
-      callback: callback,
+      ease: option.ease,
+      callback: option.callback,
       finised: false
     };
 
@@ -76,26 +77,23 @@ const motion = (function() {
 
   /**
    * Return progress value of a number
-   * @param {attr} attribute - Value to be change
-   * @param {el} element - element that contains value
+   * @param {number} start - start value
+   * @param {number} end - end value
    * @param {progress} progress - % of progression from 0 to 1
    * @return {Number} - Interpolated value
    */
   function animateNumber(start, end, progress) {
-
     // Calculate the value when it's interpolated with ease factor.
-    const interpolatedValue =
-      start +
-      (end - start) * progress;
+    const interpolatedValue = start + (end - start) * progress
     return interpolatedValue
   }
 
   /**
    * Return progress value of a number
-   * @param {attr} attribute - Value to be change
-   * @param {el} element - element that contains value
+   * @param {string} start - starting color value
+   * @param {string} end - ending color value
    * @param {progress} progress - % of progression from 0 to 1
-   * @return {Number} - Interpolated value
+   * @return {string} - Interpolated hexadecimal value
    */
   function animateColor(start, end, progress) {
     const hslStart = hexToHsl(start)
