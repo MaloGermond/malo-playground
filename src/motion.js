@@ -10,33 +10,75 @@ const motion = (function() {
   /**
    * Add an animated object to motion
    * @param {Object} obj - JS Object subject of the animation
-   * @param {Object} values - Attibutes value to reach. - {a:value, b:value,...}
+   * @param {Object} attr - Attibutes value to reach. - {a:value, b:value,...}
    * @param {Int} duration - in ms
    * @param {Object} option - Animation settings (ease, callback)
    */
   function to(obj, values, duration, option) {
 
+    // When there's no option fill it with nothing
     option == undefined ? option = "" : ""
 
     // We need to spread the startValue from the original object to get a absolute starting value. Without this changing end value will change also start value. Because both of same have same refence.
-    const output = {
-      startTime: frameCount,
-      startValue: { ...obj },
-      endValue: values,
-      duration: (duration * getTargetFrameRate()) / 1000,
-      subject: obj,
-      ease: option.ease,
-      callback: option.callback,
-      finised: false
-    };
+
+    //Check if the suject has motion apply
+
+    //console.log(matchAttr("color"))
+    //const matchItems = items.filter(el => el.subject == obj.subject)
 
     // I should add when element doesn't not existe rather than add it by default.
     // By default this function should update values rather than create one.
-    const isDefined = false
-    if(!isDefined) {
-      items.push(output)
-    }
+
+    Object.keys(values)
+      .map(attr => {
+        if(matchAttr(obj, attr)
+          .length > 0) {
+          matchAttr(obj, attr)
+            .map(el => {
+              items[el] = createKey(obj, attr, values[attr], duration, option)
+            })
+          return
+        }
+        const key = createKey(obj, attr, values[attr], duration, option)
+        items.push(key)
+      })
+
   }
+
+  function createKey(obj, attr, value, duration, option) {
+    console.log(option)
+    const output = {
+      startTime: frameCount,
+      startValue: obj[attr],
+      endValue: value,
+      attribute: attr,
+      duration: (duration * getTargetFrameRate()) / 1000,
+      object: obj,
+      ease: option.ease,
+      callback: option.callback,
+      animationEnded: false
+    };
+
+    return output
+  }
+
+  /**
+   * Check if attr are matching in object array
+   * @param {Object} obj - JS Object subject of the animation
+   * @param {Object} attr - Attibute value to reach. - {a:value, b:value,...}
+   * @retrun {Array} index
+   */
+  function matchAttr(obj, attr) {
+    const result = items.map((el, index) => {
+        if(el.object == obj && el.attribute == attr) {
+          return index
+        }
+      })
+      .filter(el => el != undefined)
+    return result
+
+  }
+
 
   /**
    * Progress and update object values
@@ -53,26 +95,28 @@ const motion = (function() {
     const easedProgress = getEaseProgress(progress, item.ease);
 
     // For each keys add progress value calulated
-    Object.keys(item.endValue)
-      .map((attr) => {
-        if(typeof(item.endValue[attr]) == "number") {
-          item.subject[attr] = animateNumber(item.startValue[attr], item.endValue[attr], easedProgress)
-          return
-        }
-        if(typeof(item.endValue[attr]) == "string") {
-          item.subject[attr] = animateColor(item.startValue[attr], item.endValue[attr], easedProgress)
-          return
-        }
-        console.error("Not supported value " + attr)
-      })
 
     // Signal that the animation has finised
     if(progress >= 1) {
-      item.finised = true;
+      item.animationEnded = true;
       if(typeof item.callback === "function") {
         item.callback();
       }
     }
+
+    if(typeof(item.endValue) == "number") {
+      item.object[item.attribute] = animateNumber(item.startValue, item.endValue, easedProgress)
+      return
+    }
+    if(typeof(item.endValue) == "string") {
+      item.object[item.attribute] = animateColor(item.startValue, item.endValue, easedProgress)
+      return
+    }
+
+    console.error("Not supported value " + attr)
+
+
+
   }
 
   /**
@@ -116,7 +160,7 @@ const motion = (function() {
       animate(el);
     });
     // deleted finised transition
-    items = items.filter((el) => !el.finised);
+    items = items.filter((el) => !el.animationEnded)
   }
 
 
