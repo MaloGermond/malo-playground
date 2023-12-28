@@ -29,9 +29,8 @@ const motion = (function() {
               const currentTime = frameCount / getTargetFrameRate() * 1000
               const startTime = currentTime + option.delay
 
-              // If start time is upper than current time.
-              // We want to add keys that has delay.
-              // We should check that keys delay aren't existing.
+              // If the start time is greater than the current time, add keys with a delay.
+              // **REMINDER** Check that keys with delay don't already exist.
               if(currentTime >= startTime) {
                 //This will replace overlaping keys.
                 items[el] = createKey(obj, attr, obj[attr], values[attr], duration, option)
@@ -50,6 +49,16 @@ const motion = (function() {
 
   }
 
+  /**
+   * Create a key for animation.
+   * @param {Object} obj - JS Object subject to the animation.
+   * @param {Object} attr - Attribute to animate.
+   * @param {number} start - Starting value.
+   * @param {number} end - Ending value.
+   * @param {number} duration - Duration of the animation in milliseconds.
+   * @param {Object} option - Animation settings (ease, callback, strength, amplitude).
+   * @returns {Object} - Animation key object.
+   */
   function createKey(obj, attr, start, end, duration, option) {
     const delay = option.delay == undefined ? 0 : option.delay
     const currentTime = frameCount / getTargetFrameRate() * 1000
@@ -72,10 +81,10 @@ const motion = (function() {
   }
 
   /**
-   * Return index of attr that match items array
-   * @param {Object} obj - JS Object subject of the animation
-   * @param {Object} attr - Attibute value to reach. - {a:value, b:value,...}
-   * @retrun {Array} index
+   * Return an array of indices of keys that match the object and attribute.
+   * @param {Object} obj - JS Object subject to the animation.
+   * @param {Object} attr - Attribute to match.
+   * @returns {Array} - Array of indices.
    */
   function matchAttr(obj, attr) {
     const result = items.map((el, index) => {
@@ -90,7 +99,7 @@ const motion = (function() {
 
   /**
    * Progress and update object values
-   * @param {Object} items - items object
+   * @param {Object} items - Animation key object.
    */
   function animate(item) {
 
@@ -133,9 +142,9 @@ const motion = (function() {
 
   /**
    * Return progress value of a number
-   * @param {number} start - start value
-   * @param {number} end - end value
-   * @param {progress} progress - % of progression from 0 to 1
+   * @param {number} start - Start value
+   * @param {number} end - End value
+   * @param {progress} progress - Progression from 0 to 1.
    * @return {Number} - Interpolated value
    */
   function animateNumber(start, end, progress) {
@@ -146,9 +155,9 @@ const motion = (function() {
 
   /**
    * Return progress value of a number
-   * @param {string} start - starting color value
-   * @param {string} end - ending color value
-   * @param {progress} progress - % of progression from 0 to 1
+   * @param {string} start - Starting color value
+   * @param {string} end - Ending color value
+   * @param {progress} progress - Progression from 0 to 1
    * @return {string} - Interpolated hexadecimal value
    */
   function animateColor(start, end, progress) {
@@ -167,7 +176,6 @@ const motion = (function() {
   }
 
   function play() {
-
     //Calculate time in ms from frame for more precision
     const currentTime = frameCount / getTargetFrameRate() * 1000
 
@@ -177,7 +185,7 @@ const motion = (function() {
 
     });
 
-    // deleted finised transition
+    // Remove finished transitions
     items = items.filter((el) => currentTime < el.startTime + el.duration)
   }
 
