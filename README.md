@@ -7,7 +7,7 @@ The Motion library provides a simple and versatile tool for handling animations 
 ### Initialization
 
 ```html
-	<script src="path/motion.js"></script>
+<script src="path/motion.js"></script>
 ```
 
 Initialize the `motion` object, which will be used to handle animations.
@@ -35,7 +35,7 @@ motion.to(obj, values, duration, option);
 
 ```javascript
 function draw(){
-	motion.play();
+motion.play();
 }
 ```
 
