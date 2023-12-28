@@ -35,7 +35,7 @@ function mousePressed() {
 	motion.to(instance, { color: getRandomHexColor() }, 3000)
 	motion.to(instance, { scale: 2 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1 })
 	motion.to(instance, { scale: 3 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1, delay: 1000 })
-	motion.to(instance, { scale: 1 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1, delay: 2000 })
+	motion.to(instance, { scale: 1 }, 1200, { ease: "spring", strenght: 10, amplitude: 1.3, delay: 2000 })
 }
 
 function getRandomHexColor() {
