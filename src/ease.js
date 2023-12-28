@@ -5,8 +5,8 @@
  * @returns {number} - Ease progress.
  */
 
-function getEaseProgress(t, ease) {
-	ease ? null : (ease = "linear");
+function getEaseProgress(t, ease, s, a) {
+	ease ? null : ease = "linear"
 
 	switch (ease) {
 		case "easeInOut":
@@ -19,7 +19,7 @@ function getEaseProgress(t, ease) {
 			return -1;
 			break;
 		case "easeInOutElastic":
-			return easeInOutElastic(t);
+			return customEasing(t);
 			break;
 		case "easeInOutBounce":
 			return easeInOutBounce(t);
@@ -28,7 +28,10 @@ function getEaseProgress(t, ease) {
 			return easeInBounce(t);
 			break;
 		case "easeOutBounce":
-			return easeOutBounce(t);
+			return easeOutBounce(t, s, a);
+			break;
+		case "spring":
+			return spring(t, s, a)
 			break;
 		default:
 			return linear(t);
@@ -58,8 +61,7 @@ function easeInOutQuint(t) {
 }
 
 function easeOutElastic(t, strength) {
-	strength === undefined ? (w = 2) : null;
-
+	const s = strength == undefined ? 2 : strength;
 	const c4 = (strength * Math.PI) / 3;
 
 	return t === 0 ?
@@ -69,8 +71,10 @@ function easeOutElastic(t, strength) {
 		Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
 }
 
-function easeInOutElastic(t) {
-	const c5 = (2 * Math.PI) / 4.5;
+function easeInOutElastic(t, strength, amplitude) {
+	const s = strength == undefined ? 2 : strength;
+	const a = amplitude == undefined ? 4.5 : amplitude
+	const c5 = (s * Math.PI) / a
 
 	return t === 0 ?
 		0 :
@@ -81,9 +85,10 @@ function easeInOutElastic(t) {
 		(Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
 }
 
-function easeOutBounce(t) {
-	const n1 = 7.5625;
-	const d1 = 2.75;
+
+function easeOutBounce(t, strenght, amplitude) {
+	const n1 = strenght == undefined ? 7.5625 : strenght;
+	const d1 = amplitude == undefined ? 2.75 : amplitude
 
 	if(t < 1 / d1) {
 		return n1 * Math.pow(t, 2);
@@ -96,8 +101,6 @@ function easeOutBounce(t) {
 	}
 }
 
-
-
 function easeInBounce(t) {
 	return 1 - easeOutBounce(1 - t);
 }
@@ -106,4 +109,11 @@ function easeInOutBounce(t) {
 	return t < 0.5 ?
 		(1 - easeOutBounce(1 - 2 * t)) / 2 :
 		(1 + easeOutBounce(2 * t - 1)) / 2;
+}
+
+function spring(t, strenght, amplitude) {
+	const s = strenght == undefined ? 7.5625 : strenght;
+	const a = amplitude == undefined ? 2.75 : amplitude
+
+	return 1 - Math.pow((1 - t), 2) * ((2 * Math.sin(s * t) / a) + Math.cos(s * t));
 }

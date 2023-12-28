@@ -2,23 +2,22 @@
 
 let instance = {
 	pos: {
-		x: 200,
-		y: 200
+		x: 250,
+		y: 250
 	},
 	size: {
-		w: 200,
-		h: 200
+		w: 100,
+		h: 100
 	},
+	scale: 1,
 	color: "#6472BA"
 }
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	//frameRate(5)
-	motion.to(instance.pos, { x: 500 }, 3000, { ease: "easeInOutElastic" })
 	motion.to(instance, { color: "#91E939" }, 3000)
-	motion.to(instance.pos, { y: 400 }, 3000, { ease: "easeInOut" })
-	//console.log(motion.debug())
+	// console.log(motion.debug())
 }
 
 function draw() {
@@ -26,15 +25,17 @@ function draw() {
 	rectMode(CENTER)
 	noStroke()
 	fill(instance.color)
-	rect(instance.pos.x, instance.pos.y, instance.size.w, instance.size.h, 12);
+	rect(instance.pos.x, instance.pos.y, instance.size.w * instance.scale, instance.size.h * instance.scale, 12);
 
-	motion.motionHandler()
+	motion.play()
 	//console.log(motion.debug())
 }
 
 function mousePressed() {
 	motion.to(instance, { color: getRandomHexColor() }, 3000)
-	motion.to(instance, { scale: 2 }, 500, { ease: "easeInOutElastic" })
+	motion.to(instance, { scale: 2 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1 })
+	motion.to(instance, { scale: 3 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1, delay: 1000 })
+	motion.to(instance, { scale: 1 }, 800, { ease: "spring", strenght: 13, amplitude: 1.1, delay: 2000 })
 }
 
 function getRandomHexColor() {

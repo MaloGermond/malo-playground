@@ -19,51 +19,60 @@ const motion = (function() {
     // When there's no option fill it with nothing
     option == undefined ? option = "" : ""
 
-    // We need to spread the startValue from the original object to get a absolute starting value. Without this changing end value will change also start value. Because both of same have same refence.
-
-    //Check if the suject has motion apply
-
-    //console.log(matchAttr("color"))
-    //const matchItems = items.filter(el => el.subject == obj.subject)
-
-    // I should add when element doesn't not existe rather than add it by default.
-    // By default this function should update values rather than create one.
-
     Object.keys(values)
       .map(attr => {
+        // Looking for keys sharing same attribute and avoid duplication.
         if(matchAttr(obj, attr)
           .length > 0) {
           matchAttr(obj, attr)
             .map(el => {
-              items[el] = createKey(obj, attr, values[attr], duration, option)
+              const currentTime = frameCount / getTargetFrameRate() * 1000
+              const startTime = currentTime + option.delay
+
+              // If start time is upper than current time.
+              // We want to add keys that has delay.
+              // We should check that keys delay aren't existing.
+              if(currentTime >= startTime) {
+                //This will replace overlaping keys.
+                items[el] = createKey(obj, attr, obj[attr], values[attr], duration, option)
+              } else {
+                //This will add the keys.
+                const key = createKey(obj, attr, null, values[attr], duration, option)
+                items.push(key)
+              }
+
             })
           return
         }
-        const key = createKey(obj, attr, values[attr], duration, option)
+        const key = createKey(obj, attr, obj[attr], values[attr], duration, option)
         items.push(key)
       })
 
   }
 
-  function createKey(obj, attr, value, duration, option) {
-    console.log(option)
+  function createKey(obj, attr, start, end, duration, option) {
+    const delay = option.delay == undefined ? 0 : option.delay
+    const currentTime = frameCount / getTargetFrameRate() * 1000
+
     const output = {
-      startTime: frameCount,
-      startValue: obj[attr],
-      endValue: value,
+      startTime: currentTime + delay,
+      startValue: start,
+      endValue: end,
       attribute: attr,
-      duration: (duration * getTargetFrameRate()) / 1000,
+      duration: duration,
       object: obj,
       ease: option.ease,
       callback: option.callback,
-      animationEnded: false
+      strenght: option.strenght,
+      amplitude: option.amplitude,
+      animated: true
     };
 
     return output
   }
 
   /**
-   * Check if attr are matching in object array
+   * Return index of attr that match items array
    * @param {Object} obj - JS Object subject of the animation
    * @param {Object} attr - Attibute value to reach. - {a:value, b:value,...}
    * @retrun {Array} index
@@ -76,7 +85,6 @@ const motion = (function() {
       })
       .filter(el => el != undefined)
     return result
-
   }
 
 
@@ -85,38 +93,42 @@ const motion = (function() {
    * @param {Object} items - items object
    */
   function animate(item) {
+
+    //Calculate time in ms from frame for more precision
+    const currentTime = frameCount / getTargetFrameRate() * 1000
+
     // Calculate time elapsed since the animation start
-    const elapsedTime = frameCount - item.startTime;
+    const elapsedTime = currentTime - item.startTime;
 
     // Convert this value to progress from 0 to 1
     const progress = Math.min(elapsedTime / item.duration, 1);
 
     // Calculate ease progress
-    const easedProgress = getEaseProgress(progress, item.ease);
+    const easedProgress = getEaseProgress(progress, item.ease, item.strenght, item.amplitude);
 
     // For each keys add progress value calulated
 
     // Signal that the animation has finised
     if(progress >= 1) {
-      item.animationEnded = true;
+      item.animated = false;
       if(typeof item.callback === "function") {
         item.callback();
       }
     }
 
     if(typeof(item.endValue) == "number") {
+      // If no starting value are define we add the value from object by default
+      const value = item.startValue == undefined ? item.startValue = item.object[item.attribute] : null
       item.object[item.attribute] = animateNumber(item.startValue, item.endValue, easedProgress)
       return
     }
     if(typeof(item.endValue) == "string") {
+      // If no starting value are define we add the value from object by default
+      const value = item.startValue == undefined ? item.startValue = item.object[item.attribute] : null
       item.object[item.attribute] = animateColor(item.startValue, item.endValue, easedProgress)
       return
     }
-
     console.error("Not supported value " + attr)
-
-
-
   }
 
   /**
@@ -154,13 +166,19 @@ const motion = (function() {
     return hslToHex(interpolatedHue.h, interpolatedHue.s, interpolatedHue.l)
   }
 
-  function motionHandler() {
+  function play() {
+
+    //Calculate time in ms from frame for more precision
+    const currentTime = frameCount / getTargetFrameRate() * 1000
+
     // Change values for each motion
     items.map((el) => {
-      animate(el);
+      currentTime - el.startTime > 0 ? animate(el) : null
+
     });
+
     // deleted finised transition
-    items = items.filter((el) => !el.animationEnded)
+    items = items.filter((el) => currentTime < el.startTime + el.duration)
   }
 
 
@@ -172,7 +190,7 @@ const motion = (function() {
     debug: debug,
     to: to,
     animate: animate,
-    motionHandler: motionHandler
+    play: play
   }
 
 })()
