@@ -35,7 +35,7 @@ motion.to(obj, values, duration, option);
 
 ```javascript
 function draw(){
-motion.play();
+  motion.play();
 }
 ```
 
