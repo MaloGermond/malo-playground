@@ -7,7 +7,7 @@ const motion = (function() {
     return items
   }
 
-  /**
+  /** 
    * Add an animated object to motion
    * @param {Object} obj - JS Object subject of the animation
    * @param {Object} attr - Attibutes value to reach. - {a:value, b:value,...}
@@ -175,8 +175,12 @@ const motion = (function() {
     return hslToHex(interpolatedHue.h, interpolatedHue.s, interpolatedHue.l)
   }
 
+  /**
+   * Update animated values based on the current frame.
+   */
+  //**REMINDER** Find how to not call this function inside draw()
   function play() {
-    //Calculate time in ms from frame for more precision
+    // Calculate time in ms from frame for more precision
     const currentTime = frameCount / getTargetFrameRate() * 1000
 
     // Change values for each motion
