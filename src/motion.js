@@ -180,7 +180,7 @@ const motion = (function() {
    */
   //**REMINDER** Find how to not call this function inside draw()
   function play() {
-    // Calculate time in ms from frame for more precision
+    //  Calculate time in ms from frame for more precision
     const currentTime = frameCount / getTargetFrameRate() * 1000
 
     // Change values for each motion
@@ -319,4 +319,15 @@ function hslToHex(h, s, l) {
     .padStart(2, '0');
 
   return `#${hexR}${hexG}${hexB}`;
+}
+
+function lerpHex(from, to, index) {
+  const start = hexToHsl(from)
+  const end = hexToHsl(to)
+
+  const h = map(index, 0, 1, start.h, end.h)
+  const s = map(index, 0, 1, start.s, end.s)
+  const l = map(index, 0, 1, start.l, end.l)
+
+  return hslToHex(h, s, l)
 }
