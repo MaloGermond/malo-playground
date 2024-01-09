@@ -1,31 +1,7 @@
-//	How it's work
-//	{} doit avoir toutes les informations sur la grille.
-//	Donc size col et row
-//	| MargeLeft | COL || COL || COL || COL || COL | MargeRight |
-//	Total width = 5 COL / 4 GAP / 2 Marge
-//	
-//	Col witdh (sans gap)
-//	setCol ou setColWidth
-//	
-//	const cells = new Array() 
-// 	getEmpty(size) -> return array of empty cell
-//	size is optional -> find a way to define complex shape area like L, E, Z shape
-//	isAvailable(absPosx,absPosY)
-
-//	I'M WRONG
-//	I need to define a array with of cell with the position, size and element in that array
-//	Then I draw this array
-//
-//
-
 const grid = (function() {
 	let config = {}
 
 	let cells = new Array()
-
-	//    0   1   2
-	// 0  0 | 1 | 2
-	// 1  3 | 4 | 5
 
 	// Define the grid config
 	function define(options) {
@@ -89,10 +65,12 @@ const grid = (function() {
 					column: i,
 					row: j,
 					position: {
-						x: i * (columnWidth + columnGap),
-						y: j * (rowHeight + rowGap),
+						x: i * (columnWidth + columnGap) + marginLeft,
+						y: j * (rowHeight + rowGap) + marginTop,
 					},
-					filled: false
+					width: columnWidth,
+					height: rowHeight,
+					empty: true
 				})
 			}
 		}
@@ -125,12 +103,11 @@ const grid = (function() {
 		stroke(0)
 		rect(0, 0, config.width, config.height)
 
-		translate(config.marginLeft, config.marginTop)
-		push()
-
 		stroke(180)
 		displayCells()
 
+		translate(config.marginLeft, config.marginTop)
+		push()
 		stroke(200)
 		rect(0, 0, config.width - config.marginRight - config.marginLeft, config.height - config.marginTop - config.marginBottom)
 		pop()
@@ -146,11 +123,17 @@ const grid = (function() {
 		return result
 	}
 
+	function select(column, row) {
+		const result = config.cells.filter(el => el.column == column && el.row == row)
+		return result
+	}
+
 
 	return {
 		display: display,
 		displayCells: displayCells,
 		getCell: getCell,
-		define: define
+		define: define,
+		select: select
 	}
 })()
