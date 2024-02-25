@@ -26,7 +26,7 @@ function setup() {
 			y: random(0, 100)
 		}
 	}
-	test.set({ width: windowWidth - 200, height: windowHeight - 200 })
+	test.define({ width: windowWidth - 200, height: windowHeight - 200 })
 }
 
 function draw() {
@@ -47,7 +47,9 @@ function draw() {
 function mousePressed() {
 	//motion.to(instance.pov, { x: random(0, 100), y: random(0, 100) }, 1500, { ease: "spring", strenght: 5, amplitude: 2 })
 	//console.log(instance.pov)
+	boxes.map(el => motion.to(el, { scale: floor(random(10, 100)) }, 3000, { ease: "spring", strenght: 5, amplitude: 2, delay: random(0, 1000) }))
 	boxes.map(el => motion.to(el.pov, { x: random(0, 100), y: random(0, 100) }, 1500, { ease: "spring", strenght: 5, amplitude: 2, delay: random(0, 1000) }))
+
 
 }
 
@@ -107,7 +109,7 @@ function createBoxes(quantity) {
 				w: width,
 				h: height
 			},
-			scale: floor(random(8, 15)),
+			scale: floor(10),
 			color: "#6472BA",
 			pov: {
 				x: random(0, 100),
