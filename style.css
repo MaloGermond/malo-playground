@@ -16,7 +16,7 @@ code {
 }
 
 .menu {
-	position: absolute;
+	position: fixed;
 	padding: 1rem;
 	background: white;
 	box-shadow: 2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),

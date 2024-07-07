@@ -10,7 +10,9 @@ let settings = {
 	offsetY: 5,
 	offset: 1,
 	dotSize: 10,
-	grayscale: true
+	grayscale: true,
+	batchSize: 2000, // Taille du traitement par lot
+	batchIndex: 0 // Stock l'étape (l'index) du traitement par lot
 }
 
 let pattern = new Array
@@ -43,10 +45,15 @@ function draw() {
 	rect(0, 0, settings.width, settings.height)
 
 	noFill()
-	stroke(150)
-	halftoneGrid.grid.map(el => {
+	noStroke()
+
+	const endIndex = halftoneGrid.grid.length
+	const elementsToDraw = halftoneGrid.grid.slice(0, settings.batchIndex);
+
+
+	elementsToDraw.map(el => {
 		const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
-		noStroke()
+
 		if(settings.grayscale) {
 			fill(el.brightness)
 		} else {
@@ -55,6 +62,10 @@ function draw() {
 
 		circle(el.x, el.y, size, size)
 	})
+
+	if(settings.batchIndex <= endIndex) {
+		settings.batchIndex += settings.batchSize;
+	}
 
 
 }
@@ -177,11 +188,13 @@ function loadGUI() {
 	document.getElementById("minDot")
 		.oninput = function() {
 			settings.minDot = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 	document.getElementById("maxDot")
 		.oninput = function() {
 			settings.maxDot = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 
@@ -191,21 +204,25 @@ function loadGUI() {
 	document.getElementById("offsetX")
 		.oninput = function() {
 			settings.offsetX = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 	document.getElementById("offsetY")
 		.oninput = function() {
 			settings.offsetY = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 	document.getElementById("offset")
 		.oninput = function() {
 			settings.offset = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 	document.getElementById("dotSize")
 		.oninput = function() {
 			settings.dotSize = this.value
+			settings.batchIndex = 0
 			halftone()
 		}
 
