@@ -2,7 +2,31 @@
 
 The Motion library provides a simple and versatile tool for handling animations with P5JS. It allows you to animate properties of JavaScript objects smoothly over time.
 
-## Usage
+## Development Environment Integration
+
+The Motion library seamlessly integrates with `lite-server` to facilitate hot reloading and efficient image loading during development. This setup ensures immediate reflection of code and image asset changes in the browser, thereby enhancing the development workflow.
+
+### Setup
+
+To get started with `lite-server`, ensure it is installed as a development dependency (`--save-dev`) in your project:
+
+```bash
+npm install lite-server --save-dev
+```
+
+### Usage
+
+#### Starting the Development Server
+
+To launch the development server, navigate to your project directory and run:
+
+```bash
+npm start
+```
+
+This command initiates the server and automatically opens your project in the default web browser.
+
+## How to use the motion library
 
 ### Initialization
 
@@ -88,32 +112,6 @@ Converts HSL values to a hexadecimal color value.
 - The easing functions used are customizable through the `ease` option.
 
 - The library supports both numeric and color animations.
-
-## Integration with lite-server for Hot Reloading and Image Loading
-
-The Motion library integrates seamlessly with `lite-server` for hot reloading and efficient image loading during development. This setup ensures that changes in your code and image assets are reflected instantly in the browser, enhancing the development workflow.
-
-### Setup
-
-Ensure `lite-server` is installed as a development dependency (`--save-dev`) in your project:
-
-```bash
-npm install lite-server --save-dev
-```
-
-### Usage
-
-1. **Starting the Development Server**:
-   - Run `lite-server` in your project directory:
-     ```bash
-     npx lite-server
-     ```
-   - This command starts the server and opens your project in the default web browser.
-
-2. **Loading Images**:
-   - Use `loadImage()` function provided by p5.js to load images dynamically.
-   - Ensure image paths are correct relative to your project structure.
-
 
 ## Example Implementation
 
