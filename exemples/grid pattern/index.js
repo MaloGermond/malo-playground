@@ -1,15 +1,15 @@
 //import motion from "./src/motion.js"
 
-let output = {
+let settings = {
 	width: 200,
 	height: 200,
 	minDot: 0,
-	maxDot: 10,
+	maxDot: 1,
 	offsetX: 5,
 	offsetY: 5,
-	offset: 1
+	offset: 1,
+	dotSize: 10
 }
-
 
 let pattern = new Array
 let img
@@ -17,12 +17,15 @@ let halftone = new Array()
 
 function preload() {
 	img = loadImage('./Mathou 1.png')
+	loadGUI()
 }
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	halphtone()
 	console.log(halftone)
+
+
 }
 
 function draw() {
@@ -33,12 +36,12 @@ function draw() {
 	noFill()
 	stroke(255, 0, 0)
 	ellipseMode(CORNER)
-	rect(0, 0, output.width, output.height)
+	rect(0, 0, settings.width, settings.height)
 
 	noFill()
 	stroke(150)
 	halftone.grid.map(el => {
-		const size = map(el.brightness, 0, 255, output.minDot, output.maxDot)
+		const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
 		noStroke()
 		fill(el.color)
 		circle(el.x, el.y, size, size)
@@ -48,12 +51,17 @@ function draw() {
 }
 
 function halphtone() {
-	const cols = output.width / output.offsetX
-	const rows = output.height / output.offsetY
+	const cols = settings.width / settings.offsetX
+	const rows = settings.height / settings.offsetY
 
-	pattern = generatePattern(cols, rows, output.offsetX, output.offsetY, output.offset)
+	pattern = generatePattern(cols, rows, settings.offsetX, settings.offsetY, settings.offset)
 	halftone = generateHalftoneMap(img, pattern)
 }
+
+
+//
+// MAIN FUNCTION
+//
 
 function generateHalftoneMap(img, pattern) {
 	// img.loadPixels()
@@ -114,4 +122,67 @@ function generatePattern(cols = 50, rows = 50, spacingX = 10, spacingY = 10, off
 	}
 
 	return pattern
+}
+
+//
+// GUI FUNCTION
+//
+
+function loadGUI() {
+	document.getElementById("width")
+		.oninput = function() {
+			const value = document.getElementById("width")
+				.value
+			settings.width = value
+			halphtone()
+		}
+	document.getElementById("height")
+		.oninput = function() {
+			const value = document.getElementById("height")
+				.value
+			settings.height = value
+			halphtone()
+		}
+	document.getElementById("minDot")
+		.oninput = function() {
+			const value = document.getElementById("minDot")
+				.value
+			settings.minDot = value
+			halphtone()
+		}
+	document.getElementById("maxDot")
+		.oninput = function() {
+			const value = document.getElementById("maxDot")
+				.value
+			settings.maxDot = value
+			halphtone()
+		}
+	document.getElementById("offsetX")
+		.oninput = function() {
+			const value = document.getElementById("offsetX")
+				.value
+			settings.offsetX = value
+			halphtone()
+		}
+	document.getElementById("offsetY")
+		.oninput = function() {
+			const value = document.getElementById("offsetY")
+				.value
+			settings.offsetY = value
+			halphtone()
+		}
+	document.getElementById("offset")
+		.oninput = function() {
+			const value = document.getElementById("offset")
+				.value
+			settings.offset = value
+			halphtone()
+		}
+	document.getElementById("dotSize")
+		.oninput = function() {
+			const value = document.getElementById("dotSize")
+				.value
+			settings.dotSize = value
+			halphtone()
+		}
 }

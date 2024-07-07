@@ -6,12 +6,28 @@
 	<meta charset="utf-8">
 	<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600&family=Titillium+Web&display=swap" rel="stylesheet">
 	<title>Grid pattern</title>
+	<link rel="stylesheet" href="../../style.css">
 </head>
 
 <body>
-	<!-- 	<section class="menu">
-		<input type="range" min="1" max="100" value="50" class="slider" id="myRange">
-	</section> -->
+	<section class="menu">
+		<label>Width</label>
+		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="width">
+		<label>Height</label>
+		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="height">
+		<label>Dot Size</label>
+		<input type="number" min="0" max="200" value="5" class="inputNumber" id="dotSize">
+		<label>Dot Size Min</label>
+		<input type="range" min="0" max="1" value="0" step="0.1" class="inputRange" id="minDot">
+		<label>Dot Size Max</label>
+		<input type="range" min="0" max="1" value="1" step="0.1" class="inputRange" id="maxDot">
+		<label>Offset (horizontal)</label>
+		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetX">
+		<label>offset (Vertical)</label>
+		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetY">
+		<label>Offset lines</label>
+		<input type="number" min="1" max="200" value="5" class="inputNumber" id="offset">
+	</section>
 	<script src="../../src/motion.js"></script>
 	<script src="../../src/ease.js"></script>
 	<script src="../../src/grid.js"></script>
