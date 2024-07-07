@@ -1,11 +1,11 @@
 //import motion from "./src/motion.js"
 
-const pattern = generatePattern(100, 50, 10, 6)
+const pattern = generatePattern(50, 50, 10, 6)
 let img
 let halftone = new Array()
 
 function preload() {
-	img = loadImage('https://plus.unsplash.com/premium_photo-1669839774770-df5a3d2da257?q=80&w=2788&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')
+	img = loadImage('./testColors.png')
 }
 
 function setup() {

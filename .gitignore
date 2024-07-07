@@ -1,4 +1,21 @@
+# Ignore backup files created by text editors
 *~
+
+# Ignore macOS specific files
 .DS_Store
+
+# Ignore assets folder and its contents
 /assets
+
+# Ignore files generated during rendering or compilation
 /render
+
+# Ignore node_modules directory (contains npm dependencies)
+node_modules/
+
+# Ignore any logs or generated files
+*.log
+*.log.*
+*.pid
+*.seed
+*.pid.lock
