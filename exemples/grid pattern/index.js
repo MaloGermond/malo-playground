@@ -95,11 +95,10 @@ function generateHalftoneGrid(img, pattern) {
 		return output
 	})
 
-	const halftone = {
+	return {
 		pattern: pattern,
 		grid: grid
 	}
-	return halftone
 }
 
 function generatePattern(cols = 50, rows = 50, spacingX = 10, spacingY = 10, offset = 1) {
@@ -121,7 +120,7 @@ function generatePattern(cols = 50, rows = 50, spacingX = 10, spacingY = 10, off
 		}
 	}
 
-	const pattern = {
+	return {
 		cols: cols,
 		rows: rows,
 		spacingX: spacingX,
@@ -129,8 +128,6 @@ function generatePattern(cols = 50, rows = 50, spacingX = 10, spacingY = 10, off
 		offset: offset,
 		points: points
 	}
-
-	return pattern
 }
 
 //
