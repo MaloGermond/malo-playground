@@ -2,7 +2,7 @@
 
 The Motion library provides a simple and versatile tool for handling animations with P5JS. It allows you to animate properties of JavaScript objects smoothly over time.
 
-## Development Environment Integration
+## Development Environment
 
 The Motion library seamlessly integrates with `lite-server` to facilitate hot reloading and efficient image loading during development. This setup ensures immediate reflection of code and image asset changes in the browser, thereby enhancing the development workflow.
 
@@ -26,9 +26,9 @@ npm start
 
 This command initiates the server and automatically opens your project in the default web browser.
 
-## How to use the motion library
+# How to use the motion library
 
-### Initialization
+## Initialization
 
 ```html
 <script src="path/motion.js"></script>
@@ -36,7 +36,7 @@ This command initiates the server and automatically opens your project in the de
 
 Initialize the `motion` object, which will be used to handle animations.
 
-### Adding Animations
+## Adding Animations
 
 ```javascript
 motion.to(obj, values, duration, option);
@@ -47,7 +47,7 @@ motion.to(obj, values, duration, option);
 - **duration (Int):** Duration of the animation in milliseconds.
 - **option (Object):** Animation settings (e.g., ease, callback).
 
-### Animation Settings
+## Animation Settings
 
 - **ease (Function):** Easing function for smooth transitions (optional).
 - **callback (Function):** Callback function to execute after the animation completes (optional).
@@ -55,7 +55,7 @@ motion.to(obj, values, duration, option);
 - **amplitude (Number):** Amplitude factor for the easing function (optional).
 - **delay (Int):** Delay before starting the animation (optional).
 
-### Playing Animations
+## Playing Animations
 
 ```javascript
 function draw(){
@@ -65,7 +65,7 @@ function draw(){
 
 This function updates the animated properties based on the current frame.
 
-## Example
+# Example
 
 ```javascript
 // Adding an animation
@@ -79,9 +79,9 @@ function draw() {
 }
 ```
 
-## Utility Functions
+# Utility Functions
 
-### Debugging
+## Debugging
 
 ```javascript
 motion.debug();
@@ -89,7 +89,7 @@ motion.debug();
 
 Returns an array of animated items for debugging purposes.
 
-### Hex to HSL Conversion
+## Hex to HSL Conversion
 
 ```javascript
 hexToHsl(string);
@@ -97,7 +97,7 @@ hexToHsl(string);
 
 Converts a hexadecimal color value to HSL (Hue, Saturation, Lightness) format.
 
-### HSL to Hex Conversion
+## HSL to Hex Conversion
 
 ```javascript
 hslToHex(h, s, l);
@@ -105,7 +105,7 @@ hslToHex(h, s, l);
 
 Converts HSL values to a hexadecimal color value.
 
-## Note
+# Note
 
 - The library internally uses the `frameCount` and `getTargetFrameRate` functions for precise time calculations.
 
@@ -113,7 +113,7 @@ Converts HSL values to a hexadecimal color value.
 
 - The library supports both numeric and color animations.
 
-## Example Implementation
+# Example Implementation
 
 ```javascript
 import motion from "./motion.js";
