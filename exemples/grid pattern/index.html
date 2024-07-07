@@ -15,18 +15,30 @@
 		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="width">
 		<label>Height</label>
 		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="height">
+		<div>
+			<input type="checkbox" class="inputBoolean" id="imageRatio" name="imageRatio" checked>
+			<label for="imageRatio">🔒️ Ratio</label>
+		</div>
+		<hr />
 		<label>Dot Size</label>
 		<input type="number" min="0" max="200" value="5" class="inputNumber" id="dotSize">
 		<label>Dot Size Min</label>
-		<input type="range" min="0" max="1" value="0" step="0.1" class="inputRange" id="minDot">
+		<input type="range" min="0" max="1" value="0" step="0.01" class="inputRange" id="minDot">
 		<label>Dot Size Max</label>
-		<input type="range" min="0" max="1" value="1" step="0.1" class="inputRange" id="maxDot">
+		<input type="range" min="0" max="1" value="1" step="0.01" class="inputRange" id="maxDot">
+		<div>
+			<input type="checkbox" class="inputBoolean" id="dotGrayscale" name="dotGrayscale" checked>
+			<label for="dotGrayscale">💡 Grayscale</label>
+		</div>
+		<hr />
 		<label>Offset (horizontal)</label>
 		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetX">
-		<label>offset (Vertical)</label>
+		<label>Offset (Vertical)</label>
 		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetY">
 		<label>Offset lines</label>
 		<input type="number" min="1" max="200" value="5" class="inputNumber" id="offset">
+		<hr />
+		<button id="buttonSave">Save</button>
 	</section>
 	<script src="../../src/motion.js"></script>
 	<script src="../../src/ease.js"></script>

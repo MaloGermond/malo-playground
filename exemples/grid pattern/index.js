@@ -3,17 +3,19 @@
 let settings = {
 	width: 200,
 	height: 200,
+	imageRatio: true,
 	minDot: 0,
 	maxDot: 1,
 	offsetX: 5,
 	offsetY: 5,
 	offset: 1,
-	dotSize: 10
+	dotSize: 10,
+	grayscale: true
 }
 
 let pattern = new Array
 let img
-let halftone = new Array()
+let halftoneGrid = new Array()
 
 function preload() {
 	img = loadImage('./Mathou 1.png')
@@ -21,41 +23,48 @@ function preload() {
 }
 
 function setup() {
-	createCanvas(windowWidth, windowHeight);
-	halphtone()
-	console.log(halftone)
+	const canvas = createCanvas(settings.width, settings.height);
+	halftone()
 
+	// console.log(halftone)
+
+	canvas.drop(handleDrop);
 
 }
 
 function draw() {
 	// noCursor()
-	background("#F8F9FA");
+	clear();
 
 	// Emcombrement de du halftone generer
 	noFill()
 	stroke(255, 0, 0)
-	ellipseMode(CORNER)
+	ellipseMode(CENTER)
 	rect(0, 0, settings.width, settings.height)
 
 	noFill()
 	stroke(150)
-	halftone.grid.map(el => {
+	halftoneGrid.grid.map(el => {
 		const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
 		noStroke()
-		fill(el.color)
+		if(settings.grayscale) {
+			fill(el.brightness)
+		} else {
+			fill(el.color)
+		}
+
 		circle(el.x, el.y, size, size)
 	})
 
 
 }
 
-function halphtone() {
+function halftone() {
 	const cols = settings.width / settings.offsetX
 	const rows = settings.height / settings.offsetY
 
 	pattern = generatePattern(cols, rows, settings.offsetX, settings.offsetY, settings.offset)
-	halftone = generateHalftoneMap(img, pattern)
+	halftoneGrid = generateHalftoneGrid(img, pattern)
 }
 
 
@@ -63,7 +72,7 @@ function halphtone() {
 // MAIN FUNCTION
 //
 
-function generateHalftoneMap(img, pattern) {
+function generateHalftoneGrid(img, pattern) {
 	// img.loadPixels()
 
 	const grid = pattern.points.map(el => {
@@ -128,61 +137,83 @@ function generatePattern(cols = 50, rows = 50, spacingX = 10, spacingY = 10, off
 // GUI FUNCTION
 //
 
+function handleDrop(file) {
+	if(file.type != "image") {
+		return
+	}
+	img = loadImage(file.data);
+	halftone()
+}
+
+const buttonWidth = document.getElementById("width")
+const buttonHeight = document.getElementById("height")
+
+const checkboxGrayscale = document.getElementById("dotGrayscale")
+
 function loadGUI() {
-	document.getElementById("width")
-		.oninput = function() {
-			const value = document.getElementById("width")
-				.value
-			settings.width = value
-			halphtone()
+
+	buttonWidth.oninput = function() {
+		settings.width = this.value
+		if(settings.imageRatio) {
+			const ratio = img.height / img.width
+			settings.height = this.value * ratio
+			buttonHeight.value = settings.height
 		}
-	document.getElementById("height")
-		.oninput = function() {
-			const value = document.getElementById("height")
-				.value
-			settings.height = value
-			halphtone()
+		resizeCanvas(settings.width, settings.height);
+		halftone()
+	}
+	buttonHeight.oninput = function() {
+		settings.height = this.value
+		if(settings.imageRatio) {
+			const ratio = img.width / img.height
+			settings.width = this.value * ratio
+			buttonWidth.value = settings.width
+		}
+		resizeCanvas(settings.width, settings.height);
+		halftone()
+	}
+
+	document.getElementById("imageRatio")
+		.onchange = function() {
+			settings.imageRatio = this.checked
 		}
 	document.getElementById("minDot")
 		.oninput = function() {
-			const value = document.getElementById("minDot")
-				.value
-			settings.minDot = value
-			halphtone()
+			settings.minDot = this.value
+			halftone()
 		}
 	document.getElementById("maxDot")
 		.oninput = function() {
-			const value = document.getElementById("maxDot")
-				.value
-			settings.maxDot = value
-			halphtone()
+			settings.maxDot = this.value
+			halftone()
 		}
+
+	checkboxGrayscale.onchange = function() {
+		settings.grayscale = this.checked
+	}
 	document.getElementById("offsetX")
 		.oninput = function() {
-			const value = document.getElementById("offsetX")
-				.value
-			settings.offsetX = value
-			halphtone()
+			settings.offsetX = this.value
+			halftone()
 		}
 	document.getElementById("offsetY")
 		.oninput = function() {
-			const value = document.getElementById("offsetY")
-				.value
-			settings.offsetY = value
-			halphtone()
+			settings.offsetY = this.value
+			halftone()
 		}
 	document.getElementById("offset")
 		.oninput = function() {
-			const value = document.getElementById("offset")
-				.value
-			settings.offset = value
-			halphtone()
+			settings.offset = this.value
+			halftone()
 		}
 	document.getElementById("dotSize")
 		.oninput = function() {
-			const value = document.getElementById("dotSize")
-				.value
-			settings.dotSize = value
-			halphtone()
+			settings.dotSize = this.value
+			halftone()
+		}
+
+	document.getElementById("buttonSave")
+		.onclick = function() {
+			saveCanvas('untitled.png');
 		}
 }
