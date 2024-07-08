@@ -1,3 +1,80 @@
+@font-face {
+	font-family: Satoshi;
+	src: url("./assets/Satoshi-Variable.ttf");
+}
+
+* {
+	font-family: Satoshi;
+}
+
+canvas {
+	border: 1px;
+	border-color: #d2e4d7;
+	border-style: solid;
+}
+
+.header-900 {
+	font-family: Satoshi;
+	font-size: 6rem;
+	font-weight: 800;
+}
+
+.header-600 {
+	font-family: Satoshi;
+	font-size: 4rem;
+	font-weight: 800;
+}
+
+.header-300 {
+	font-family: Satoshi;
+	font-size: 2rem;
+	font-weight: 800;
+}
+
+.medium {
+	color: #9A9C98;
+}
+
+.m-w-900 {
+	max-width: 1080px;
+}
+
+.m-w-500 {
+	max-width: 512px;
+}
+
+.w-400 {
+	width: 256px;
+}
+
+.w-300 {
+	width: 192px;
+}
+
+.m-w-300 {
+	max-width: 192px;
+}
+
+.m-w-200 {
+	max-width: 128px;
+}
+
+.flew {
+	display: flex;
+}
+
+.flex-column {
+	flex-direction: column;
+}
+
+.flex-row {
+	flex-direction: rows;
+}
+
+.cover {
+	object-fit: cover;
+}
+
 code {
 	background: #37373B;
 	color: white;

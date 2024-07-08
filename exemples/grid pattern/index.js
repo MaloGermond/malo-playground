@@ -8,10 +8,10 @@ let settings = {
 	maxDot: 1,
 	offsetX: 5,
 	offsetY: 5,
-	offset: 1,
+	offset: 5,
 	dotSize: 10,
 	grayscale: true,
-	batchSize: 2000, // Taille du traitement par lot
+	batchSize: 1000, // Taille du traitement par lot
 	batchIndex: 0 // Stock l'étape (l'index) du traitement par lot
 }
 
@@ -37,12 +37,6 @@ function setup() {
 function draw() {
 	// noCursor()
 	clear();
-
-	// Emcombrement de du halftone generer
-	noFill()
-	stroke(255, 0, 0)
-	ellipseMode(CENTER)
-	rect(0, 0, settings.width, settings.height)
 
 	noFill()
 	noStroke()
