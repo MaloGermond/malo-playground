@@ -1,18 +1,19 @@
 //import motion from "./src/motion.js"
 
 let settings = {
-	width: 200,
-	height: 200,
+	width: 500,
+	height: 500,
 	imageRatio: true,
 	minDot: 0,
 	maxDot: 1,
 	offsetX: 5,
 	offsetY: 5,
 	offset: 5,
-	dotSize: 10,
+	dotSize: 5,
 	grayscale: true,
 	batchSize: 1000, // Taille du traitement par lot
-	batchIndex: 0 // Stock l'étape (l'index) du traitement par lot
+	batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
+	distortion: 0 // Add random position to the dot
 }
 
 let pattern = new Array
@@ -89,8 +90,8 @@ function generateHalftoneGrid(img, pattern) {
 		// console.log(x + "			" + y)
 
 		const output = {
-			x: el.x,
-			y: el.y,
+			x: el.x + random(0, settings.distortion),
+			y: el.y + random(0, settings.distortion),
 			color: color,
 			brightness: brightness(color),
 			imgX: x,
@@ -151,6 +152,7 @@ const buttonWidth = document.getElementById("width")
 const buttonHeight = document.getElementById("height")
 
 const checkboxGrayscale = document.getElementById("dotGrayscale")
+const inputDistortion = document.getElementById("distortion")
 
 function loadGUI() {
 
@@ -182,14 +184,10 @@ function loadGUI() {
 	document.getElementById("minDot")
 		.oninput = function() {
 			settings.minDot = this.value
-			settings.batchIndex = 0
-			halftone()
 		}
 	document.getElementById("maxDot")
 		.oninput = function() {
 			settings.maxDot = this.value
-			settings.batchIndex = 0
-			halftone()
 		}
 
 	checkboxGrayscale.onchange = function() {
@@ -216,12 +214,15 @@ function loadGUI() {
 	document.getElementById("dotSize")
 		.oninput = function() {
 			settings.dotSize = this.value
-			settings.batchIndex = 0
-			halftone()
 		}
 
 	document.getElementById("buttonSave")
 		.onclick = function() {
 			saveCanvas('untitled.png');
 		}
+
+	inputDistortion.oninput = function() {
+		settings.distortion = this.value
+		halftone()
+	}
 }

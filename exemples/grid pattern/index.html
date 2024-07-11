@@ -12,9 +12,9 @@
 <body>
 	<section class="menu">
 		<label>Width</label>
-		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="width">
+		<input type="number" min="50" max="5000" value="500" class="inputNumber" id="width">
 		<label>Height</label>
-		<input type="number" min="50" max="5000" value="200" class="inputNumber" id="height">
+		<input type="number" min="50" max="5000" value="500" class="inputNumber" id="height">
 		<div>
 			<input type="checkbox" class="inputBoolean" id="imageRatio" name="imageRatio" checked>
 			<label for="imageRatio">🔒️ Ratio</label>
@@ -25,18 +25,21 @@
 		<label>Dot Size Min</label>
 		<input type="range" min="0" max="1" value="0" step="0.01" class="inputRange" id="minDot">
 		<label>Dot Size Max</label>
-		<input type="range" min="0" max="1" value="1" step="0.01" class="inputRange" id="maxDot">
+		<input type="range" min="0" max="2" value="1" step="0.01" class="inputRange" id="maxDot">
 		<div>
 			<input type="checkbox" class="inputBoolean" id="dotGrayscale" name="dotGrayscale" checked>
 			<label for="dotGrayscale">💡 Grayscale</label>
 		</div>
 		<hr />
 		<label>Offset (horizontal)</label>
-		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetX">
+		<input type="number" min="1" max="200" value="5" class="inputNumber" id="offsetX">
 		<label>Offset (Vertical)</label>
-		<input type="number" min="0" max="200" value="5" class="inputNumber" id="offsetY">
+		<input type="number" min="1" max="200" value="5" class="inputNumber" id="offsetY">
 		<label>Offset lines</label>
 		<input type="number" min="1" max="200" value="5" class="inputNumber" id="offset">
+		<hr />
+		<label>Distortion</label>
+		<input type="number" min="0" max="10" step="0.1" value="0" class="inputNumber" id="distortion">
 		<hr />
 		<button id="buttonSave">Save</button>
 	</section>
