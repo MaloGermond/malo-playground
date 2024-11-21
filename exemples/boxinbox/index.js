@@ -26,7 +26,7 @@ function setup() {
 			y: random(0, 100)
 		}
 	}
-	test.set({ width: windowWidth - 200, height: windowHeight - 200 })
+	//test.set({ width: windowWidth - 200, height: windowHeight - 200 })
 }
 
 function draw() {
