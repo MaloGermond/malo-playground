@@ -1,5 +1,11 @@
 {
   "server": {
-    "baseDir": "./"
+    "baseDir": ["./", "./exemples/projet"]
+  },
+  "files": ["./**/*.{html,css,js}"],
+  "notify": false,
+  "reloadDelay": 500,
+  "server.routes": {
+    "/projet": "./exemples/projet"
   }
 }

@@ -15,31 +15,31 @@ let instance = {
 
 const sentence = "We are uncovering better ways of developing software by doing it and helping others do it. Through this work we have come to value."
 const letters = sentence.split('')
-const instLetter
+const letter = []
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
 	//frameRate(5)
 	letter.map((l, index) => motion.to())
 
-	motion.to(instance, { color: "#91E939" }, 3000)
-	// console.log(motion.debug())
+	//motion.to(instance, { color: "#91E939" }, 3000)
+	//console.log(motion.debug())
 }
 
 function draw() {
 	background("#F8F9FA");
-	// push()
-	// beginClip()
+	push()
+	beginClip()
 	fill("#c0c0c0")
 	noStroke()
 	rect(200, 185, instance.size.w, 40)
 	fill(instance.color)
-	// endClip()
+	endClip()
 
 	textSize(20)
 	letters.map((l, index) => text(l, instance.pos.x + index * 10, instance.pos.y, instance.size.w))
 	//text(sentence, instance.pos.x, instance.pos.y, instance.size.w)
-	// pop()
+	pop()
 	motion.play()
 	//console.log(motion.debug())
 }
