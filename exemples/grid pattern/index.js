@@ -18,6 +18,7 @@ let settings = {
 
 let pattern = new Array
 let img
+let render
 let halftoneGrid = new Array()
 
 function preload() {
@@ -33,6 +34,8 @@ function setup() {
 
 	canvas.drop(handleDrop);
 
+	halftone()
+
 }
 
 function draw() {
@@ -45,23 +48,25 @@ function draw() {
 	const endIndex = halftoneGrid.grid.length
 	const elementsToDraw = halftoneGrid.grid.slice(0, settings.batchIndex);
 
+	image(pg,0,0)
 
-	elementsToDraw.map(el => {
-		const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
+	// elementsToDraw.map(el => {
+	// 	const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
 
-		if(settings.grayscale) {
-			fill(el.brightness)
-		} else {
-			fill(el.color)
-		}
+	// 	if(settings.grayscale) {
+	// 		fill(el.brightness)
+	// 	} else {
+	// 		fill(el.color)
+	// 	}
 
-		circle(el.x, el.y, size, size)
-	})
+	// 	circle(el.x, el.y, size, size)
+	// })
 
-	if(settings.batchIndex <= endIndex) {
-		settings.batchIndex += settings.batchSize;
-	}
+	// if(settings.batchIndex <= endIndex) {
+	// 	settings.batchIndex += settings.batchSize;
+	// }
 
+	
 
 }
 
@@ -71,6 +76,31 @@ function halftone() {
 
 	pattern = generatePattern(cols, rows, settings.offsetX, settings.offsetY, settings.offset)
 	halftoneGrid = generateHalftoneGrid(img, pattern)
+	renderHalftone(halftoneGrid)
+}
+
+//
+//	Use PGraphic for performance
+//
+
+// Here I translate halftoneGrid into PGgraphic image
+
+function renderHalftone(halftoneGrid){
+
+  pg = createGraphics(settings.width, settings.height);
+  pg.background(255)
+  pg.noStroke()
+  console.log(halftoneGrid)
+  halftoneGrid.grid.map(el=>{
+  	const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
+
+  	if(settings.grayscale) {
+			pg.fill(el.brightness)
+		} else {
+			pg.fill(el.color)
+		}
+    pg.circle(el.x,el.y,size,size)
+  })
 }
 
 
@@ -184,14 +214,17 @@ function loadGUI() {
 	document.getElementById("minDot")
 		.oninput = function() {
 			settings.minDot = this.value
+			halftone()
 		}
 	document.getElementById("maxDot")
 		.oninput = function() {
 			settings.maxDot = this.value
+			halftone()
 		}
 
 	checkboxGrayscale.onchange = function() {
 		settings.grayscale = this.checked
+		halftone()
 	}
 	document.getElementById("offsetX")
 		.oninput = function() {
@@ -214,6 +247,7 @@ function loadGUI() {
 	document.getElementById("dotSize")
 		.oninput = function() {
 			settings.dotSize = this.value
+			halftone()
 		}
 
 	document.getElementById("buttonSave")
