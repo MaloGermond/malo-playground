@@ -49,8 +49,8 @@ const halftone = (function() {
 
 	// This fonction create a grid of point
 	function createHalftoneGrid(settings){
-		const cols = settings.imageWidth / settings.spacingX
-		const rows = settings.imageHeight / settings.spacingY
+		const cols = settings.outputWidth / settings.spacingX
+		const rows = settings.outputHeight / settings.spacingY
 
 		// Espacement des points sur les axes X et Y
 		const spacingX = settings.spacingX
@@ -90,18 +90,18 @@ const halftone = (function() {
 
 	// This funtion convert patter Array into an image
 	function generateImage(pattern){
-		console.log(pattern)
+		// console.log(pattern)
 
 		const settings = pattern.settings
 
-		if(settings.imageWidth===undefined || settings.imageHeight===undefined){
-			console.error("settings.imageWidth or settings.imageWeight is undefined")
+		if(settings.outputWidth===undefined || settings.outputHeight===undefined){
+			console.error("settings.imageWidth or settings.imageHeight is undefined")
 		}
 		
-		const pg = createGraphics(settings.imageWidth, settings.imageHeight);
-		
-		pg.background(255)
+		const pg = createGraphics(settings.outputWidth, settings.outputHeight);
+		pg.clear()
 		pg.noStroke()
+		pg.ellipseMode(CENTER)
 
 		  pattern.scheme.map(el=>{
 		  	const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)

@@ -1,6 +1,6 @@
 {
   "server": {
-    "baseDir": ["./", "./exemples/projet"]
+    "baseDir": ["./", "./exemples/projet"],
   },
   "files": ["./**/*.{html,css,js}"],
   "notify": false,

@@ -226,8 +226,7 @@ function loadGUI() {
 			settings.offset = this.value
 			settings.batchIndex = 0
 			halftone()
-		}
-	document.getElementById("dotSize")
+			document.getElementById("dotSize")
 		.oninput = function() {
 			settings.dotSize = this.value
 			halftone()
