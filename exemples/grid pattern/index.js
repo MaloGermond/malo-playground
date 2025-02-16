@@ -10,7 +10,7 @@ let settings = {
 	offsetY: 5,
 	offset: 5,
 	dotSize: 5,
-	grayscale: true,
+	grayscale: false,
 	batchSize: 1000, // Taille du traitement par lot
 	batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
 	distortion: 0 // Add random position to the dot
@@ -50,23 +50,6 @@ function draw() {
 
 	image(pg,0,0)
 
-	// elementsToDraw.map(el => {
-	// 	const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
-
-	// 	if(settings.grayscale) {
-	// 		fill(el.brightness)
-	// 	} else {
-	// 		fill(el.color)
-	// 	}
-
-	// 	circle(el.x, el.y, size, size)
-	// })
-
-	// if(settings.batchIndex <= endIndex) {
-	// 	settings.batchIndex += settings.batchSize;
-	// }
-
-	
 
 }
 
