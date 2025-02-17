@@ -3,11 +3,18 @@ const halftone = (function() {
 		return true
 	}
 
-	function render(image,settings) {
+	function render(image,settings,mode="CANVAS") {
 		// Creation de la grille de points (pattern) qui contient couleur et effets.
 		const pattern = convertImageToPattern(image,settings)
-		const outputImage = generateImage(pattern)
-		return outputImage
+		if(mode ==="CANVAS"){
+			const canvas = generateCanvas(pattern)
+			return canvas
+		}
+
+		if(mode === "SVG"){
+			const svg = generateSVG(pattern)
+			return svg
+		}
 	}
 
 	// This function convert an Image to an pattern Array
@@ -98,7 +105,7 @@ const halftone = (function() {
 	}
 
 	// This funtion convert patter Array into an image
-	function generateImage(pattern){
+	function generateCanvas(pattern){
 		// console.log(pattern)
 
 		const settings = pattern.settings
@@ -131,12 +138,48 @@ const halftone = (function() {
 		return pg
 	}
 
+	function generateSVG(pattern){
+
+    // Création de l'élément SVG
+    const svgNS = "http://www.w3.org/2000/svg"
+    const svg = document.createElementNS(svgNS, "svg")
+
+    svg.setAttribute("width", settings.outputWidth)
+    svg.setAttribute("height", settings.outputHeight)
+    svg.setAttribute("viewBox", `0 0 ${settings.outputWidth} ${settings.outputHeight}`)
+    svg.setAttribute("xmlns", svgNS)
+
+    // Génération des cercles en demi-teinte
+    pattern.scheme.forEach(el => {
+    	const size = (map(el.brightness, 0, 255, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize);
+
+    	const circle = document.createElementNS(svgNS, "circle");
+        circle.setAttribute("cx", el.x + size / 2);
+        circle.setAttribute("cy", el.y + size / 2);
+        circle.setAttribute("r", size / 2);
+
+        if (settings.grayscale) {
+            const brightnessValue = `rgb(${el.brightness},${el.brightness},${el.brightness})`;
+            circle.setAttribute("fill", brightnessValue);
+            circle.setAttribute("fill-opacity", el.alpha / 255);
+        } else {
+            circle.setAttribute("fill", `rgb(${el.color[0]},${el.color[1]},${el.color[2]})`);
+        }
+
+        svg.appendChild(circle);
+    })
+    
+    return svg
+	}
+
+
 	return {
     test: test,
     render: render,
     createHalftoneGrid:createHalftoneGrid,
     convertImageToPattern: convertImageToPattern,
-    generateImage: generateImage
+    generateCanvas: generateCanvas,
+    generateSVG: generateSVG
   }
 })()
 

@@ -172,12 +172,33 @@ function render(){
   imageResult = halftone.render(imageSource, settings)
 }
 
+function exportSVG(fileName="untitled"){
+
+  const svg = halftone.render(imageSource, settings,"SVG")
+
+  const serializer = new XMLSerializer();
+  const source = serializer.serializeToString(svg);
+
+  // Get the SVG content as a string
+
+  const blob = new Blob([source], { type: "text/plain" });
+  const a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName+".svg";
+  a.click();
+
+  URL.revokeObjectURL(a.href); // Clean up
+}
+
+
 //
 // Lil-gui Management
 //
 
 const GUIactions = {
     savePNG : function() {saveCanvas(imageResult,settings.exportName,'png')},
+    saveSVG: function() {exportSVG()},
     clearStorage : function() {localStorage.clear()}
   }
 
@@ -232,7 +253,8 @@ function loadGUI(){
 
   // EXPORT CONTROLE
   guiExport.add( settings, 'exportName').name("File name").onChange( updateMemory())
-  guiExport.add( GUIactions, 'savePNG').name("Save")
+  guiExport.add( GUIactions, 'savePNG').name(".png")
+  guiExport.add( GUIactions, 'saveSVG').name(".svg")
   guiExport.add( GUIactions, 'clearStorage').name("Reset")
 
 
