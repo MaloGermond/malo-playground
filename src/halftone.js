@@ -153,6 +153,10 @@ const halftone = (function() {
     pattern.scheme.forEach(el => {
     	const size = (map(el.brightness, 0, 255, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize);
 
+    	if(size<=0||el.alpha===0){
+		  	return
+		  }
+
     	const circle = document.createElementNS(svgNS, "circle");
         circle.setAttribute("cx", el.x + size / 2);
         circle.setAttribute("cy", el.y + size / 2);
@@ -168,7 +172,7 @@ const halftone = (function() {
 
         svg.appendChild(circle);
     })
-    
+
     return svg
 	}
 
