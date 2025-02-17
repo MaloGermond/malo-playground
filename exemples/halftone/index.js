@@ -1,6 +1,5 @@
 // TO DO
 //
-//  - Export SVG
 //  - Image storage when reload
 //  - Choose background color when exporting image
 //  - Choose artboard background color
@@ -20,13 +19,17 @@
 let settings = {
   outputWidth: 500,
   outputHeight: 500,
+  output:{
+    backgroundColor: '#fff',
+    backgroundOpacity: 100
+  },
   imageRatio: true,
   minDot: 0,
-  maxDot: 1,
+  maxDot: 100,
   spacingX: 10,
   spacingY: 10,
   offset: 5,
-  dotSize: 5,
+  dotSize: 30,
   grayscale: true,
   batchSize: 1000, // Taille du traitement par lot
   batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
@@ -172,7 +175,7 @@ function render(){
   imageResult = halftone.render(imageSource, settings)
 }
 
-function exportSVG(fileName="untitled"){
+function exportSVG(){
 
   const svg = halftone.render(imageSource, settings,"SVG")
 
@@ -185,7 +188,7 @@ function exportSVG(fileName="untitled"){
   const a = document.createElement("a");
 
   a.href = URL.createObjectURL(blob);
-  a.download = fileName+".svg";
+  a.download = settings.exportName+".svg";
   a.click();
 
   URL.revokeObjectURL(a.href); // Clean up
@@ -231,6 +234,8 @@ function loadGUI(){
     }
     render()})
   output.add( settings, 'imageRatio').onChange(value =>{render()})
+  output.addColor( settings.output, 'backgroundColor').name("Background Color").onChange(value =>{render()})
+  output.add( settings.output, 'backgroundOpacity',0,255,1).name("Background Opacity").onChange(value =>{render()})
 
   // GRID CONTROLE
   grid.add( settings, 'dotSize',0.1,40,0.1).name("Dots size").onChange(value =>{render()})

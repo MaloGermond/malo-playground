@@ -116,6 +116,13 @@ const halftone = (function() {
 		
 		const pg = createGraphics(settings.outputWidth, settings.outputHeight);
 		pg.clear()
+
+		// Can be clean for sure !
+		const convertColor = color(settings.output.backgroundColor)
+		const background = color(convertColor.levels[0],convertColor.levels[1],convertColor.levels[2],settings.output.backgroundOpacity)
+
+		pg.background(background)
+
 		pg.noStroke()
 		pg.ellipseMode(CENTER)
 
