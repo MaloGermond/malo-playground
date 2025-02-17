@@ -181,15 +181,15 @@ function loadGUI(){
   output.add( settings, 'imageRatio').onChange(value =>{render()})
 
   // GRID CONTROLE
-  grid.add( settings, 'dotSize',0.1,40).name("Dots size").onChange(value =>{render()})
-  grid.add( settings, 'minDot',0,100).name("Min size").onChange(value =>{render()})
-  grid.add( settings, 'maxDot',0,100).name("Max size").onChange(value =>{render()})
+  grid.add( settings, 'dotSize',0.1,40,0.1).name("Dots size").onChange(value =>{render()})
+  grid.add( settings, 'minDot',0,100,0.1).name("Min size").onChange(value =>{render()})
+  grid.add( settings, 'maxDot',0,100,0.1).name("Max size").onChange(value =>{render()})
 
   grid.add( settings, 'distortion',0,10).onChange(value =>{render()})
 
-  grid.add( settings, 'spacingX',1,100).onChange(value =>{render()})
-  grid.add( settings, 'spacingY',1,100).onChange(value =>{render()})
-  grid.add( settings, 'offset', 0,1).onChange(value =>{render()})
+  grid.add( settings, 'spacingX',1,100,0.01).onChange(value =>{render()})
+  grid.add( settings, 'spacingY',1,100,0.01).onChange(value =>{render()})
+  grid.add( settings, 'offset', 0,1,0.01).onChange(value =>{render()})
 
 
   // GRID COLORS
@@ -218,7 +218,7 @@ function handleDrop(file) {
 }
 
 function handleZoom(event) {
-  const zoomChange = clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax)
+  const zoomChange = round(clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
 
   settings.artboard.zoom = zoomChange
 }
