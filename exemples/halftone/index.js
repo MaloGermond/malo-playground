@@ -47,6 +47,9 @@ function setup() {
 function draw(){
   clear();
 
+
+  drawTransparentGrid(settings.artboard.zoom)
+
   push()
   translate(settings.artboard.x,settings.artboard.y)
   scale(settings.artboard.zoom)
@@ -71,6 +74,42 @@ function mouseDragged(){
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
+
+//
+// ARTBOARD
+//
+
+function createTransparentGrid() {
+  const size = 256
+  const squareNumber = 32
+  const squareSize = size/squareNumber
+
+  const tile = createGraphics(size, size);
+
+  tile.noStroke();
+
+  for (let y = 0; y < size; y += squareSize) {
+    for (let x = 0; x < size; x += squareSize) {
+      tile.fill(0, 0, 0, (x / squareSize + y / squareSize) % 2 == 0 ? 50 : 100);
+      tile.rect(x, y, squareSize, squareSize)   
+    }
+  }
+
+  return tile
+}
+
+function drawTransparentGrid(zoom){
+  const tile = createTransparentGrid()
+
+  const size = map(zoom,0.1,10,256,2048,true)
+
+  for (let y = 0; y < windowHeight; y += size) {
+    for (let x = 0; x < windowWidth; x += size) {
+      image(tile, x, y, size, size);
+    }
+  }
+}
+  
 
 //
 // Haltone
