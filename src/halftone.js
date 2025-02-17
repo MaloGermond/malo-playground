@@ -58,22 +58,29 @@ const halftone = (function() {
 		const spacingX = settings.spacingX
 		const spacingY = settings.spacingY
 
-		// Décalage de lignes en lignes
-		const offset = settings.offset
+
 		
 		// Array qui contiendra la grille de points
-		let points = [];
+		let points = []
+		let offset = 0
 
 		for(let row = 0; row < rows + 2; row++) {
-			for(let col = 0; col < cols + 2; col++) {
+			// Décalage de lignes en lignes
+			let offset = row * (settings.offset*spacingX)
+
+			// Ajuster le nombre de colonnes pour compenser le décalage
+    	let extraCols = Math.ceil(offset / spacingX); 
+
+			for(let col = -extraCols; col < cols + 2; col++) {
 				// Calcul des coordonnées x et y
-				let x = col * spacingX;
+				let x = col * spacingX + offset;
 				let y = row * spacingY;
 
-				// Add offset
-				x += (row % offset) * (spacingX / offset);
-				// Offset the row to stay in rectangle selection
-				x -= spacingX
+				// // Add offset
+				// x += (row % offset) * (spacingX / offset);
+
+				// Ca fait un super effet circulaire !
+				// x -= offset*row
 
 				points.push({ x: x, y: y });
 			}

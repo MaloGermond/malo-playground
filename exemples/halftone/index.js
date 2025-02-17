@@ -1,6 +1,17 @@
 // TO DO
 //
-//  - 
+//  - Export SVG
+//  - Image storage when reload
+//  - Choose background color when exporting image
+//  - Choose artboard background color
+//  - Allow source image modification (contrast, black point, white point)
+//  - Calculate cpu performance
+//  - Optimaise halfone render perfomance
+//  - Allow CMJN export (or n colors export)
+//  - Allow export of only one channel
+//  - Allow grid rotation
+//  - Render huge image by batch biome
+//  - Allow to choose something else than dot (cross, square) for rendering
 //
 
 
@@ -178,7 +189,7 @@ function loadGUI(){
 
   grid.add( settings, 'spacingX',1,100).onChange(value =>{render()})
   grid.add( settings, 'spacingY',1,100).onChange(value =>{render()})
-  grid.add( settings, 'offset', 0,0.1).onChange(value =>{render()})
+  grid.add( settings, 'offset', 0,1).onChange(value =>{render()})
 
 
   // GRID COLORS
