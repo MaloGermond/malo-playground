@@ -13,6 +13,7 @@
 //  - Render huge image by batch biome
 //  - Allow to choose something else than dot (cross, square) for rendering
 //  - Mieux gerer les questions de ratio d'image
+//  - Ajouter un halftone Black and White avec une gestion du niveau de brightness qui deviens noir ou blanc
 //
 
 
@@ -111,14 +112,22 @@ function handleNavigation(event) {
 
   // keyCode for cmd == 91 
 
+  // Pressed cmd and scroll vertical to zoom
   if(keyIsDown(91)){
     const zoomChange = round(clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
 
     settings.artboard.zoom = zoomChange
   }else{
-    settings.artboard.x -= event.deltaX
-    settings.artboard.y -= event.deltaY
+
+    const scaledImageWidth = settings.outputWidth*settings.artboard.zoom
+    const scaledImageHeight = settings.outputHeight*settings.artboard.zoom
+
+    // clamp is here to had some hard limite to paneling and avoir to lost the content.
+   
+    settings.artboard.x = clamp(settings.artboard.x - event.deltaX,-scaledImageWidth/2,windowWidth+scaledImageWidth/2)
+    settings.artboard.y = clamp(settings.artboard.y - event.deltaY,-scaledImageHeight/2,windowHeight+scaledImageHeight/2)
   }
+
 }
 
 
