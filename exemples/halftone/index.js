@@ -56,7 +56,7 @@ function setup() {
   // Charger les cookies
   const artboard = createCanvas(windowWidth, windowHeight);
   artboard.drop(handleDrop)
-  artboard.mouseWheel(handleZoom)
+  artboard.mouseWheel(handleNavigation)
 
   loadMemory()
   loadGUI()
@@ -92,8 +92,7 @@ function mouseDragged(){
   if (isMouseOverGUI) {
     return
   }
-  settings.artboard.x += movedX
-    settings.artboard.y += movedY
+
 }
 
 //
@@ -107,6 +106,21 @@ function clamp(value, min, max) {
 //
 // ARTBOARD
 //
+
+function handleNavigation(event) {
+
+  // keyCode for cmd == 91 
+
+  if(keyIsDown(91)){
+    const zoomChange = round(clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
+
+    settings.artboard.zoom = zoomChange
+  }else{
+    settings.artboard.x -= event.deltaX
+    settings.artboard.y -= event.deltaY
+  }
+}
+
 
 function createTransparentGrid() {
   const size = 256
@@ -224,13 +238,6 @@ function handleDrop(file) {
   imageSource = loadImage(file.data);
   render()
 }
-
-function handleZoom(event) {
-  const zoomChange = round(clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
-
-  settings.artboard.zoom = zoomChange
-}
-
 
 
 //
