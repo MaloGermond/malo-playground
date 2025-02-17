@@ -124,7 +124,7 @@ const halftone = (function() {
 				}
 
 
-		    pg.circle(el.x,el.y,size,size)
+		    pg.circle(el.x+size/2,el.y+size/2,size,size)
 
 
 		  })
