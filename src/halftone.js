@@ -32,13 +32,15 @@ const halftone = (function() {
             x: el.x + random(0, settings.distortion),    // Déformation aléatoire sur l'axe X
             y: el.y + random(0, settings.distortion),    // Déformation aléatoire sur l'axe Y
             color: color,                                // Couleur du pixel
-            brightness: brightness(color),               // Luminosité de la couleur
+            brightness: brightness(color),							 // Luminosité de la couleur
+            alpha: color[3],               							// Opacité de la couleur
             mappedX: mappedX,                            // Position X sur l'image
             mappedY: mappedY                             // Position Y sur l'image
         }
 
 			return output
 		})
+
 
 		return	{
 			settings: settings,
@@ -109,7 +111,7 @@ const halftone = (function() {
 		  		return
 		  	}
 		  	if(settings.grayscale) {
-					pg.fill(el.brightness)
+					pg.fill(el.brightness,el.alpha)
 				} else {
 					pg.fill(el.color)
 				}
