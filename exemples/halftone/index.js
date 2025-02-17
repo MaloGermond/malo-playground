@@ -12,6 +12,7 @@
 //  - Allow grid rotation
 //  - Render huge image by batch biome
 //  - Allow to choose something else than dot (cross, square) for rendering
+//  - Mieux gerer les questions de ratio d'image
 //
 
 
@@ -72,7 +73,14 @@ function draw(){
   translate(settings.artboard.x,settings.artboard.y)
   scale(settings.artboard.zoom)
   imageMode(CENTER);
+  rectMode(CENTER)
   image(imageResult,0,0,settings.outputWidth,settings.outputHeight)
+
+  // Create a rectangle around the image
+  stroke("#0C8CE9")
+  noFill()
+  rect(-1,-1,settings.outputWidth+2,settings.outputHeight+2)
+
   pop()
 
   imageMode(CORNER);
