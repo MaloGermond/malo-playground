@@ -104,15 +104,19 @@ const halftone = (function() {
 		pg.ellipseMode(CENTER)
 
 		  pattern.scheme.map(el=>{
-		  	const size = map(el.brightness, 0, 255, settings.minDot * settings.dotSize, settings.maxDot * settings.dotSize)
-
+		  	const size = map(el.brightness, 0, 255, settings.minDot/100, settings.maxDot/100)* settings.dotSize 
+		  	if(size<=0){
+		  		return
+		  	}
 		  	if(settings.grayscale) {
 					pg.fill(el.brightness)
 				} else {
 					pg.fill(el.color)
 				}
 
+
 		    pg.circle(el.x,el.y,size,size)
+
 
 		  })
 		return pg

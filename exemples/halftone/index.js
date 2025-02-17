@@ -24,6 +24,8 @@ let settings = {
   }
 }
 
+let isMouseOverGUI = false;
+
 
 let imageSource
 let imageResult
@@ -63,8 +65,11 @@ function draw(){
 }
 
 function mouseDragged(){
+  if (isMouseOverGUI) {
+    return
+  }
   settings.artboard.x += movedX
-  settings.artboard.y += movedY
+    settings.artboard.y += movedY
 }
 
 //
@@ -112,7 +117,7 @@ function drawTransparentGrid(zoom){
   
 
 //
-// Haltone
+// HALFTONE
 //
 
 function render(){
@@ -132,6 +137,9 @@ const GUIactions = {
 function loadGUI(){
   const GUI = lil.GUI;
   const gui = new GUI();
+
+  gui.domElement.addEventListener('mouseenter', () => isMouseOverGUI = true);
+  gui.domElement.addEventListener('mouseleave', () => isMouseOverGUI = false);
 
   const output = gui.addFolder( 'Image Parameters' );
   const artboard = gui.addFolder( 'Artboard' );
@@ -157,8 +165,8 @@ function loadGUI(){
   output.add( settings, 'imageRatio').onChange( value => {render()})
 
   // GRID CONTROLE
-  grid.add( settings, 'minDot',0.1,100).onChange( value => {render()})
-  grid.add( settings, 'maxDot',0.1,100).onChange( value => {render()})
+  grid.add( settings, 'minDot',0,100).onChange( value => {render()})
+  grid.add( settings, 'maxDot',0,100).onChange( value => {render()})
 
   grid.add( settings, 'dotSize',0.1,40).onChange( value => {render()})
   grid.add( settings, 'distortion',0,10).onChange( value => {render()})
