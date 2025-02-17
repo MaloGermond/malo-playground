@@ -13,11 +13,14 @@ let settings = {
   batchSize: 1000, // Taille du traitement par lot
   batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
   distortion: 0, // Add random position to the dot
+  exportName: "untitled",
   src: null, // The image use for generate the halftone.
   artboard:{
     x:0,
     y:0,
     zoom:1,
+    zoomMin:0.1,
+    zoomMax:10
   }
 }
 
@@ -33,7 +36,8 @@ function preload(){
 function setup() {
   // Charger les cookies
   const artboard = createCanvas(windowWidth, windowHeight);
-  artboard.drop(handleDrop);
+  artboard.drop(handleDrop)
+  artboard.mouseWheel(handleZoom)
 
   loadMemory()
   loadGUI()
@@ -61,6 +65,14 @@ function mouseDragged(){
 }
 
 //
+//  GENERAL FUNCTIOIN
+//
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+//
 // Haltone
 //
 
@@ -74,7 +86,7 @@ function render(){
 //
 
 const GUIactions = {
-    savePNG : function() {saveCanvas(imageResult,'untitled','png')},
+    savePNG : function() {saveCanvas(imageResult,settings.exportName,'png')},
     clearStorage : function() {localStorage.clear()}
   }
 
@@ -82,40 +94,52 @@ function loadGUI(){
   const GUI = lil.GUI;
   const gui = new GUI();
 
+  const output = gui.addFolder( 'Image Parameters' );
+  const artboard = gui.addFolder( 'Artboard' );
+  const grid = gui.addFolder( 'Grid' );
+  const guiExport = gui.addFolder( 'Export' );
 
-  gui.add( settings.artboard, 'zoom',0.1,10,0.05)
+  // ZOOM Management
+  artboard.add( settings.artboard, 'zoom',settings.artboard.zoomMin,settings.artboard.zoomMax,0.05).listen()
 
-  gui.add( settings, 'outputWidth').listen().onChange( value => {
+  // OUTPUT Values
+  output.add( settings, 'outputWidth').listen().onChange( value => {
     if(settings.imageRatio) {
       const ratio = Math.round(settings.outputHeight / settings.outputWidth)
       settings.outputHeight = value * ratio
     }
     render()})
-  gui.add( settings, 'outputHeight').listen().onChange( value => {
+  output.add( settings, 'outputHeight').listen().onChange( value => {
     if(settings.imageRatio) {
       const ratio = Math.round(settings.outputHeight / settings.outputWidth)
       settings.outputWidth = Math.round(value * ratio)
     }
     render()})
-  gui.add( settings, 'imageRatio').onChange( value => {render()})
+  output.add( settings, 'imageRatio').onChange( value => {render()})
 
-  gui.add( settings, 'minDot',0.1,100).onChange( value => {render()})
-  gui.add( settings, 'maxDot',0.1,100).onChange( value => {render()})
+  // GRID CONTROLE
+  grid.add( settings, 'minDot',0.1,100).onChange( value => {render()})
+  grid.add( settings, 'maxDot',0.1,100).onChange( value => {render()})
 
-  gui.add( settings, 'spacingX',1,100).onChange( value => {render()})
-  gui.add( settings, 'spacingY',1,100).onChange( value => {render()})
-  gui.add( settings, 'offset', 0,0.1).onChange( value => {render()})
+  grid.add( settings, 'dotSize',0.1,40).onChange( value => {render()})
+  grid.add( settings, 'distortion',0,10).onChange( value => {render()})
 
-  gui.add( settings, 'dotSize',0.1,40).onChange( value => {render()})
-  gui.add( settings, 'distortion',0,10).onChange( value => {render()})
+  grid.add( settings, 'spacingX',1,100).onChange( value => {render()})
+  grid.add( settings, 'spacingY',1,100).onChange( value => {render()})
+  grid.add( settings, 'offset', 0,0.1).onChange( value => {render()})
 
-  gui.add( settings, 'grayscale').onChange( value => {render()})
 
-  gui.add( settings, 'batchSize').onChange( value => {render()})
-  gui.add( settings, 'batchIndex').onChange( value => {render()})
+  // GRID COLORS
+  grid.add( settings, 'grayscale').onChange( value => {render()})
 
-  gui.add( GUIactions, 'savePNG').name("Save")
-   gui.add( GUIactions, 'clearStorage').name("Reset")
+  // RESSOURCES MANAGEMENT
+  // gui.add( settings, 'batchSize').onChange( value => {render()})
+  // gui.add( settings, 'batchIndex').onChange( value => {render()})
+
+  // EXPORT CONTROLE
+  guiExport.add( settings, 'exportName').name("File name")
+  guiExport.add( GUIactions, 'savePNG').name("Save")
+  guiExport.add( GUIactions, 'clearStorage').name("Reset")
 
 
 }
@@ -128,6 +152,12 @@ function handleDrop(file) {
 
   imageSource = loadImage(file.data);
   render()
+}
+
+function handleZoom(event) {
+  const zoomChange = clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax)
+
+  settings.artboard.zoom = zoomChange
 }
 
 

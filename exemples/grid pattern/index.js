@@ -13,7 +13,8 @@ let settings = {
 	grayscale: false,
 	batchSize: 1000, // Taille du traitement par lot
 	batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
-	distortion: 0 // Add random position to the dot
+	distortion: 0, // Add random position to the dot
+	exportName: "untitled"
 }
 
 let pattern = new Array
