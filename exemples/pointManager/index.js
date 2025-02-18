@@ -9,7 +9,7 @@ function setup() {
 }
 
 function draw() {
-  background("#F3F9F7"); // Ajout d'un fond pour éviter les traînées
+  background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
 
   // Dessine la ligne reliant les points de la courbe
   drawLine(curve);
@@ -48,7 +48,7 @@ function getNearestPoint(shape, position) {
  */
 function displayPoint(point) {
   noStroke();
-  fill("#eee");
+  fill('#eee');
   ellipse(point.x, point.y, 12, 12);
 }
 
@@ -78,7 +78,7 @@ function mousePressed() {
  * @returns {p5.Vector} - Vecteur représentant le point
  */
 function addPoint(x, y) {
-  console.log("Add point:", { x }, { y });
+  console.log('Add point:', { x }, { y });
   return createVector(x, y);
 }
 
@@ -92,7 +92,7 @@ function drawLine(points) {
   }
 
   noFill();
-  stroke("#000");
+  stroke('#000');
   strokeWeight(16);
 
   for (let p = 0; p < points.length - 1; p++) {

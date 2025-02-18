@@ -13,23 +13,18 @@ function setup() {
 }
 
 function draw() {
-  background(color("#F3F9F7"));
+  background(color('#F3F9F7'));
   addPoint(mouseX, mouseY, 50);
 
   if (points.length > 60) {
     points = points.slice(1);
   }
 
-  drawCurve(points, 20, 50, "#F3F9F7", "#3C615A");
+  drawCurve(points, 20, 50, '#F3F9F7', '#3C615A');
 }
 
 function addPoint(x, y, d) {
-  const distance = dist(
-    points[points.length - 1].x,
-    points[points.length - 1].y,
-    x,
-    y
-  );
+  const distance = dist(points[points.length - 1].x, points[points.length - 1].y, x, y);
   if (distance > d) {
     points.push(createVector(x, y));
   }
@@ -50,9 +45,7 @@ function drawCurve(points, swStart, swEnd, cStart, cEnd) {
   );
   for (let p = 0; p < points.length - 3; p++) {
     const progress = strokeWeight(map(p, 0, points.length - 3, swStart, swEnd));
-    stroke(
-      lerpColor(color(cStart), color(cEnd), map(p, 0, points.length - 3, 0, 1))
-    );
+    stroke(lerpColor(color(cStart), color(cEnd), map(p, 0, points.length - 3, 0, 1)));
     curve(
       points[p].x,
       points[p].y,

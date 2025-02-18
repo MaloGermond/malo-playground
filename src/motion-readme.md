@@ -30,7 +30,7 @@ motion.to(obj, values, duration, option);
 ## Playing Animations
 
 ```javascript
-function draw(){
+function draw() {
   motion.play();
 }
 ```
@@ -88,7 +88,7 @@ Converts HSL values to a hexadecimal color value.
 # Example Implementation
 
 ```javascript
-import motion from "./motion.js";
+import motion from './motion.js';
 
 // Example usage of the motion library
 motion.to(myObject, { x: 100, y: 200 }, 1000, { ease: easeInOut, callback: onAnimationComplete });

@@ -1,13 +1,13 @@
 // Motion handle all animations. It's used for execting animations.
 
-const motion = (function() {
-  let items = new Array()
+const motion = (function () {
+  let items = new Array();
 
   function debug() {
-    return items
+    return items;
   }
 
-  /** 
+  /**
    * Add an animated object to motion
    * @param {Object} obj - JS Object subject of the animation
    * @param {Object} attr - Attibutes value to reach. - {a:value, b:value,...}
@@ -15,38 +15,32 @@ const motion = (function() {
    * @param {Object} option - Animation settings (ease, callback)
    */
   function to(obj, values, duration, option) {
-
     // When there's no option fill it with nothing
-    option == undefined ? option = "" : ""
+    option == undefined ? (option = '') : '';
 
-    Object.keys(values)
-      .map(attr => {
-        // Looking for keys sharing same attribute and avoid duplication.
-        if(matchAttr(obj, attr)
-          .length > 0) {
-          matchAttr(obj, attr)
-            .map(el => {
-              const currentTime = frameCount / getTargetFrameRate() * 1000
-              const startTime = currentTime + option.delay
+    Object.keys(values).map((attr) => {
+      // Looking for keys sharing same attribute and avoid duplication.
+      if (matchAttr(obj, attr).length > 0) {
+        matchAttr(obj, attr).map((el) => {
+          const currentTime = (frameCount / getTargetFrameRate()) * 1000;
+          const startTime = currentTime + option.delay;
 
-              // If the start time is greater than the current time, add keys with a delay.
-              // **REMINDER** Check that keys with delay don't already exist.
-              if(currentTime >= startTime) {
-                //This will replace overlaping keys.
-                items[el] = createKey(obj, attr, obj[attr], values[attr], duration, option)
-              } else {
-                //This will add the keys.
-                const key = createKey(obj, attr, null, values[attr], duration, option)
-                items.push(key)
-              }
-
-            })
-          return
-        }
-        const key = createKey(obj, attr, obj[attr], values[attr], duration, option)
-        items.push(key)
-      })
-
+          // If the start time is greater than the current time, add keys with a delay.
+          // **REMINDER** Check that keys with delay don't already exist.
+          if (currentTime >= startTime) {
+            //This will replace overlaping keys.
+            items[el] = createKey(obj, attr, obj[attr], values[attr], duration, option);
+          } else {
+            //This will add the keys.
+            const key = createKey(obj, attr, null, values[attr], duration, option);
+            items.push(key);
+          }
+        });
+        return;
+      }
+      const key = createKey(obj, attr, obj[attr], values[attr], duration, option);
+      items.push(key);
+    });
   }
 
   /**
@@ -60,8 +54,8 @@ const motion = (function() {
    * @returns {Object} - Animation key object.
    */
   function createKey(obj, attr, start, end, duration, option) {
-    const delay = option.delay == undefined ? 0 : option.delay
-    const currentTime = frameCount / getTargetFrameRate() * 1000
+    const delay = option.delay == undefined ? 0 : option.delay;
+    const currentTime = (frameCount / getTargetFrameRate()) * 1000;
 
     const output = {
       startTime: currentTime + delay,
@@ -74,10 +68,10 @@ const motion = (function() {
       callback: option.callback,
       strenght: option.strenght,
       amplitude: option.amplitude,
-      animated: true
+      animated: true,
     };
 
-    return output
+    return output;
   }
 
   /**
@@ -87,24 +81,23 @@ const motion = (function() {
    * @returns {Array} - Array of indices.
    */
   function matchAttr(obj, attr) {
-    const result = items.map((el, index) => {
-        if(el.object == obj && el.attribute == attr) {
-          return index
+    const result = items
+      .map((el, index) => {
+        if (el.object == obj && el.attribute == attr) {
+          return index;
         }
       })
-      .filter(el => el != undefined)
-    return result
+      .filter((el) => el != undefined);
+    return result;
   }
-
 
   /**
    * Progress and update object values
    * @param {Object} items - Animation key object.
    */
   function animate(item) {
-
     //Calculate time in ms from frame for more precision
-    const currentTime = frameCount / getTargetFrameRate() * 1000
+    const currentTime = (frameCount / getTargetFrameRate()) * 1000;
 
     // Calculate time elapsed since the animation start
     const elapsedTime = currentTime - item.startTime;
@@ -118,26 +111,28 @@ const motion = (function() {
     // For each keys add progress value calulated
 
     // Signal that the animation has finised
-    if(progress >= 1) {
+    if (progress >= 1) {
       item.animated = false;
-      if(typeof item.callback === "function") {
+      if (typeof item.callback === 'function') {
         item.callback();
       }
     }
 
-    if(typeof(item.endValue) == "number") {
+    if (typeof item.endValue == 'number') {
       // If no starting value are define we add the value from object by default
-      const value = item.startValue == undefined ? item.startValue = item.object[item.attribute] : null
-      item.object[item.attribute] = animateNumber(item.startValue, item.endValue, easedProgress)
-      return
+      const value =
+        item.startValue == undefined ? (item.startValue = item.object[item.attribute]) : null;
+      item.object[item.attribute] = animateNumber(item.startValue, item.endValue, easedProgress);
+      return;
     }
-    if(typeof(item.endValue) == "string") {
+    if (typeof item.endValue == 'string') {
       // If no starting value are define we add the value from object by default
-      const value = item.startValue == undefined ? item.startValue = item.object[item.attribute] : null
-      item.object[item.attribute] = animateColor(item.startValue, item.endValue, easedProgress)
-      return
+      const value =
+        item.startValue == undefined ? (item.startValue = item.object[item.attribute]) : null;
+      item.object[item.attribute] = animateColor(item.startValue, item.endValue, easedProgress);
+      return;
     }
-    console.error("Not supported value " + attr)
+    console.error('Not supported value ' + attr);
   }
 
   /**
@@ -149,8 +144,8 @@ const motion = (function() {
    */
   function animateNumber(start, end, progress) {
     // Calculate the value when it's interpolated with ease factor.
-    const interpolatedValue = start + (end - start) * progress
-    return interpolatedValue
+    const interpolatedValue = start + (end - start) * progress;
+    return interpolatedValue;
   }
 
   /**
@@ -161,18 +156,17 @@ const motion = (function() {
    * @return {string} - Interpolated hexadecimal value
    */
   function animateColor(start, end, progress) {
-    const hslStart = hexToHsl(start)
-    const hslEnd = hexToHsl(end)
+    const hslStart = hexToHsl(start);
+    const hslEnd = hexToHsl(end);
 
     // Calculate the hue when it's interpolated with ease factor.
     const interpolatedHue = {
       h: animateNumber(hslStart.h, hslEnd.h, progress),
       s: animateNumber(hslStart.s, hslEnd.s, progress),
-      l: animateNumber(hslStart.l, hslEnd.l, progress)
-    }
+      l: animateNumber(hslStart.l, hslEnd.l, progress),
+    };
 
-
-    return hslToHex(interpolatedHue.h, interpolatedHue.s, interpolatedHue.l)
+    return hslToHex(interpolatedHue.h, interpolatedHue.s, interpolatedHue.l);
   }
 
   /**
@@ -181,19 +175,16 @@ const motion = (function() {
   //**REMINDER** Find how to not call this function inside draw()
   function play() {
     //  Calculate time in ms from frame for more precision
-    const currentTime = frameCount / getTargetFrameRate() * 1000
+    const currentTime = (frameCount / getTargetFrameRate()) * 1000;
 
     // Change values for each motion
     items.map((el) => {
-      currentTime - el.startTime > 0 ? animate(el) : null
-
+      currentTime - el.startTime > 0 ? animate(el) : null;
     });
 
     // Remove finished transitions
-    items = items.filter((el) => currentTime < el.startTime + el.duration)
+    items = items.filter((el) => currentTime < el.startTime + el.duration);
   }
-
-
 
   // ---
   // Expose private functions publicly
@@ -202,10 +193,9 @@ const motion = (function() {
     debug: debug,
     to: to,
     animate: animate,
-    play: play
-  }
-
-})()
+    play: play,
+  };
+})();
 
 //
 // Utility functions
@@ -213,7 +203,7 @@ const motion = (function() {
 
 function hexToHsl(string) {
   // Remove the hash if present
-  const hex = string.replace(/^#/, '')
+  const hex = string.replace(/^#/, '');
 
   // Parse the hex color to RGB
   let bigint = parseInt(hex, 16);
@@ -235,13 +225,13 @@ function hexToHsl(string) {
 
   // Calculate the saturation
   let s = 0;
-  if(max !== min) {
+  if (max !== min) {
     s = l > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min);
   }
 
   // Calculate the hue
   let h = 0;
-  if(max !== min) {
+  if (max !== min) {
     switch (max) {
       case r:
         h = (g - b) / (max - min) + (g < b ? 6 : 0);
@@ -264,7 +254,7 @@ function hexToHsl(string) {
 
 function hslToHex(h, s, l) {
   // Convert hue to degrees
-  h = (h % 360 + 360) % 360;
+  h = ((h % 360) + 360) % 360;
 
   // Normalize saturation and lightness to be in the range [0, 1]
   s = Math.max(0, Math.min(1, s));
@@ -272,27 +262,27 @@ function hslToHex(h, s, l) {
 
   // Convert HSL to RGB
   let c = (1 - Math.abs(2 * l - 1)) * s;
-  let x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  let x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   let m = l - c / 2;
 
   let r, g, b;
-  if(h >= 0 && h < 60) {
+  if (h >= 0 && h < 60) {
     r = c;
     g = x;
     b = 0;
-  } else if(h >= 60 && h < 120) {
+  } else if (h >= 60 && h < 120) {
     r = x;
     g = c;
     b = 0;
-  } else if(h >= 120 && h < 180) {
+  } else if (h >= 120 && h < 180) {
     r = 0;
     g = c;
     b = x;
-  } else if(h >= 180 && h < 240) {
+  } else if (h >= 180 && h < 240) {
     r = 0;
     g = x;
     b = c;
-  } else if(h >= 240 && h < 300) {
+  } else if (h >= 240 && h < 300) {
     r = x;
     g = 0;
     b = c;
@@ -308,26 +298,20 @@ function hslToHex(h, s, l) {
   b = (b + m) * 255;
 
   // Convert RGB to hexadecimal
-  const hexR = Math.round(r)
-    .toString(16)
-    .padStart(2, '0');
-  const hexG = Math.round(g)
-    .toString(16)
-    .padStart(2, '0');
-  const hexB = Math.round(b)
-    .toString(16)
-    .padStart(2, '0');
+  const hexR = Math.round(r).toString(16).padStart(2, '0');
+  const hexG = Math.round(g).toString(16).padStart(2, '0');
+  const hexB = Math.round(b).toString(16).padStart(2, '0');
 
   return `#${hexR}${hexG}${hexB}`;
 }
 
 function lerpHex(from, to, index) {
-  const start = hexToHsl(from)
-  const end = hexToHsl(to)
+  const start = hexToHsl(from);
+  const end = hexToHsl(to);
 
-  const h = map(index, 0, 1, start.h, end.h)
-  const s = map(index, 0, 1, start.s, end.s)
-  const l = map(index, 0, 1, start.l, end.l)
+  const h = map(index, 0, 1, start.h, end.h);
+  const s = map(index, 0, 1, start.s, end.s);
+  const l = map(index, 0, 1, start.l, end.l);
 
-  return hslToHex(h, s, l)
+  return hslToHex(h, s, l);
 }

@@ -1,115 +1,116 @@
 @font-face {
-	font-family: Satoshi;
-	src: url("./assets/Satoshi-Variable.ttf");
+  font-family: Satoshi;
+  src: url('./assets/Satoshi-Variable.ttf');
 }
 
 * {
-	font-family: Satoshi;
+  font-family: Satoshi;
 }
 
-body{
-	margin: 0;
-	overflow: hidden;
+body {
+  margin: 0;
+  overflow: hidden;
 }
 
 canvas {
-	border: 1px;
-	border-color: #d2e4d7;
-	border-style: solid;
+  border: 1px;
+  border-color: #d2e4d7;
+  border-style: solid;
 }
 
 .header-900 {
-	font-family: Satoshi;
-	font-size: 6rem;
-	font-weight: 800;
+  font-family: Satoshi;
+  font-size: 6rem;
+  font-weight: 800;
 }
 
 .header-600 {
-	font-family: Satoshi;
-	font-size: 4rem;
-	font-weight: 800;
+  font-family: Satoshi;
+  font-size: 4rem;
+  font-weight: 800;
 }
 
 .header-300 {
-	font-family: Satoshi;
-	font-size: 2rem;
-	font-weight: 800;
+  font-family: Satoshi;
+  font-size: 2rem;
+  font-weight: 800;
 }
 
 .medium {
-	color: #9A9C98;
+  color: #9a9c98;
 }
 
 .m-w-900 {
-	max-width: 1080px;
+  max-width: 1080px;
 }
 
 .m-w-500 {
-	max-width: 512px;
+  max-width: 512px;
 }
 
 .w-400 {
-	width: 256px;
+  width: 256px;
 }
 
 .w-300 {
-	width: 192px;
+  width: 192px;
 }
 
 .m-w-300 {
-	max-width: 192px;
+  max-width: 192px;
 }
 
 .m-w-200 {
-	max-width: 128px;
+  max-width: 128px;
 }
 
 .flew {
-	display: flex;
+  display: flex;
 }
 
 .flex-column {
-	flex-direction: column;
+  flex-direction: column;
 }
 
 .flex-row {
-	flex-direction: rows;
+  flex-direction: rows;
 }
 
 .cover {
-	object-fit: cover;
+  object-fit: cover;
 }
 
 code {
-	background: #37373B;
-	color: white;
+  background: #37373b;
+  color: white;
 
-	padding: 0.2rem 0.4rem;
-	margin: 0.4rem 0;
+  padding: 0.2rem 0.4rem;
+  margin: 0.4rem 0;
 
-	border-radius: 0.3rem;
+  border-radius: 0.3rem;
 }
 
 .project {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-	padding: 1rem;
+  padding: 1rem;
 }
 
 .menu {
-	position: fixed;
-	padding: 1rem;
-	background: white;
-	box-shadow: 2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
-		6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
-		12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
-		22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
-		41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
-		100px 100px 80px rgba(0, 0, 0, 0.07);
-	border-radius: 0.2rem;
-	right: 0;
-	margin: 0.5rem;
-	display: flex;
-	flex-direction: column;
+  position: fixed;
+  padding: 1rem;
+  background: white;
+  box-shadow:
+    2.8px 2.8px 2.2px rgba(0, 0, 0, 0.02),
+    6.7px 6.7px 5.3px rgba(0, 0, 0, 0.028),
+    12.5px 12.5px 10px rgba(0, 0, 0, 0.035),
+    22.3px 22.3px 17.9px rgba(0, 0, 0, 0.042),
+    41.8px 41.8px 33.4px rgba(0, 0, 0, 0.05),
+    100px 100px 80px rgba(0, 0, 0, 0.07);
+  border-radius: 0.2rem;
+  right: 0;
+  margin: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }

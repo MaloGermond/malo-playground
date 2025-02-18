@@ -8,12 +8,14 @@
     "doc": "doc"
   },
   "scripts": {
-    "start": "lite-server"
+    "start": "lite-server",
+    "format": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "lite-server": "^2.6.1"
+    "lite-server": "^2.6.1",
+    "prettier": "^3.5.1"
   },
   "dependencies": {
     "lil-gui": "^0.20.0"
