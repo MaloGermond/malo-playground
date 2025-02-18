@@ -51,6 +51,7 @@ let settings = {
     zoomMin: 0.1,
     zoomMax: 10,
   },
+  dbVersion: 1,
 };
 
 let isMouseOverGUI = false;
@@ -235,6 +236,10 @@ const GUIactions = {
   clearStorage: function () {
     localStorage.clear();
   },
+  newFile: function () {
+    localStorage.clear();
+    location.reload();
+  },
 };
 
 function loadGUI() {
@@ -248,6 +253,11 @@ function loadGUI() {
   const artboard = gui.addFolder('Artboard');
   const pattern = gui.addFolder('Pattern');
   const guiExport = gui.addFolder('Export');
+
+  gui.title('Settings');
+
+  // New file
+  gui.add(GUIactions, 'newFile').name('New');
 
   // ZOOM Management
   artboard
@@ -338,7 +348,6 @@ function loadGUI() {
   guiExport.add(settings, 'exportName').name('File name').onChange(updateMemory());
   guiExport.add(GUIactions, 'savePNG').name('.png');
   guiExport.add(GUIactions, 'saveSVG').name('.svg');
-  guiExport.add(GUIactions, 'clearStorage').name('Reset');
 }
 
 function handleDrop(file) {
@@ -364,14 +373,14 @@ function handleDrop(file) {
 // Il faut aussi une autre fonction qui à chaque changement ou tout les n (minutes) met à jours les cookies.
 
 function loadMemory() {
-  // if(getCookie("settings")){
-  //   settings = JSON.parse(getCookie("settings"))
-  // }
-  if (localStorage.settings !== undefined) {
-    settings = JSON.parse(localStorage.settings);
+  // Inicialisation de settings dans local storage. Ne charge rien
+  if (localStorage.settings === undefined) {
+    return;
   }
+
+  settings = JSON.parse(localStorage.settings);
+
   console.log('Memory loaded');
-  // console.log(settings)
 }
 
 function updateMemory() {
@@ -379,4 +388,84 @@ function updateMemory() {
   // localStorage.setItem("imageSource", imageSource.pixels)
   console.log('Memory stored');
   // console.log(localStorage)
+}
+
+//
+// IndexedDB
+//
+
+//imageSource.canvas.toDataURL()
+//saveToDB('image', 1,imageSource.canvas.toDataURL()  )
+
+function saveToDB(storeName = 'default', version = 1, value) {
+  // Ouvre une base de données avec le nom 'storeName' et la version 'version'
+  let request = indexedDB.open(storeName, version);
+
+  request.onupgradeneeded = function () {
+    // Lorsque la base de données est créée ou mise à jour, cette fonction est appelée
+    let db = request.result; // Récupère l'instance de la base de données
+
+    // Crée un object store dans la base de données. Le nom est 'storeName' (par défaut 'test')
+    if (!db.objectStoreNames.contains(storeName)) {
+      db.createObjectStore(storeName, { keyPath: 'id' });
+    }
+  };
+
+  request.onsuccess = function () {
+    // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
+    let db = request.result; // Récupère l'instance de la base de données
+
+    // Commence une transaction avec le store 'storeName' en mode 'readwrite'
+    let tx = db.transaction(storeName, 'readwrite'); // Le nom du store est 'storeName' (pas 'store')
+
+    // Problème ici : tu utilises à nouveau le nom 'store', qui fait référence à la variable du paramètre et à la variable de la transaction
+    let store = tx.objectStore(storeName); // Cette ligne pose problème car le nom de la variable est le même que le paramètre 'storeName', créant une confusion
+
+    // On insère des données dans le store en utilisant un objet avec un id et les données à insérer
+    store.put({ id: 1, data: value }); // Ajoute un élément avec id 1 et les données passées à la fonction
+  };
+}
+
+// loadFromDB('image')
+
+function loadFromDB(storeName = 'default', version = 1, id = 1) {
+  // Ouvre une base de données avec le nom 'storeName' et la version 'version'
+  let request = indexedDB.open(storeName, version);
+
+  request.onsuccess = function () {
+    // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
+    let db = request.result; // Récupère l'instance de la base de données
+
+    // Commence une transaction avec le store en mode lecture ('readonly')
+    let tx = db.transaction(storeName, 'readonly');
+
+    // Accède à l'object store du nom spécifié
+    let store = tx.objectStore(storeName);
+
+    // Demande la lecture de l'élément avec id = 1 (on suppose que l'id est 1 pour cet exemple)
+    let getRequest = store.get(id);
+
+    getRequest.onsuccess = function () {
+      // Lorsque l'élément est récupéré avec succès
+      let result = getRequest.result;
+
+      if (result) {
+        console.log('Données récupérées :', result.data); // Affiche les données de l'élément avec id = 1
+        return result.data; // Retourne les données de l'élément
+      } else {
+        console.log("Aucune donnée trouvée pour l'id ", id);
+        return null; // Si aucune donnée n'est trouvée
+      }
+    };
+
+    getRequest.onerror = function () {
+      console.error('Erreur lors de la récupération des données');
+      return null; // Si une erreur se produit
+    };
+  };
+
+  request.onerror = function () {
+    console.error("Erreur lors de l'ouverture de la base de données");
+    return null; // Si une erreur se produit lors de l'ouverture de la base de données
+  };
 }
