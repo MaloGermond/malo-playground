@@ -380,36 +380,3 @@ function updateMemory() {
   console.log('Memory stored');
   // console.log(localStorage)
 }
-
-//
-//   COOKIE
-//
-// Plus besoin des cookies je passe par le local storage
-
-function setCookie(name, value, days) {
-  let expires = '';
-  if (days) {
-    let date = new Date();
-    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000); // Convertir jours en millisecondes
-    expires = '; expires=' + date.toUTCString();
-  }
-  document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/';
-}
-
-function getCookie(name) {
-  let cookies = document.cookie.split('; ');
-  for (let cookie of cookies) {
-    let [key, value] = cookie.split('=');
-    if (key === name) {
-      return decodeURIComponent(value);
-    }
-  }
-  return null; // Retourne null si le cookie n'existe pas
-}
-
-function clearAllCookies() {
-  document.cookie.split(';').forEach((cookie) => {
-    let name = cookie.split('=')[0].trim();
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-  });
-}
