@@ -19,6 +19,7 @@
 // - Déplacer le fond background damier en même temps que l'on se déplace
 // - Fixer le zoom du background damier quand on zoom
 // - Faire que l'on puisse zoom en direction du centre de la vue plutôt que de l'artboard.
+// - Permettre l'ajout d'un calque pour modifier/cacher la taille des points et/ou la couleur
 
 let settings = {
   outputWidth: 500,
