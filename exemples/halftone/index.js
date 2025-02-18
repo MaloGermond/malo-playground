@@ -5,7 +5,7 @@
 // - Sauvegarder l’image lors du rechargement de la page (prio 1)
 // - Optimiser les performances du rendu en demi-ton (prio 1)
 // - Rendre possible le rendu d’images très grandes en traitement par batch (prio 1)
-// - Ajouter des options de modification de l’image source (contraste, point noir, point blanc) (prio 1)
+// - Ajouter des options de modification de l’image source (contraste, point noir, point blanc) -> C'est une lib ca (prio 1)
 //
 // - Permettre de choisir la couleur de fond lors de l’exportation de l’image (prio 2)
 // - Ajouter la possibilité d’exporter uniquement un canal spécifique (prio 2)
@@ -20,6 +20,9 @@
 // - Fixer le zoom du background damier quand on zoom
 // - Faire que l'on puisse zoom en direction du centre de la vue plutôt que de l'artboard.
 // - Permettre l'ajout d'un calque pour modifier/cacher la taille des points et/ou la couleur
+//
+//
+//
 
 let settings = {
   outputWidth: 500,
@@ -80,22 +83,9 @@ function draw() {
 
   drawTransparentGrid(settings.artboard.zoom);
 
-  push();
-  translate(settings.artboard.x, settings.artboard.y);
-  scale(settings.artboard.zoom);
-  imageMode(CENTER);
-  rectMode(CENTER);
-  image(imageResult, 0, 0, settings.outputWidth, settings.outputHeight);
+  drawRenderLayer();
 
-  // Create a rectangle around the image
-  stroke('#0C8CE9');
-  noFill();
-  rect(-1, -1, settings.outputWidth + 2, settings.outputHeight + 2);
-
-  pop();
-
-  imageMode(CORNER);
-  image(imageSource, 0, 0, 200, 200);
+  drawPreviewImageSource();
 }
 
 function mouseDragged() {
@@ -185,6 +175,29 @@ function drawTransparentGrid(zoom) {
 // HALFTONE
 //
 
+function drawRenderLayer() {
+  push();
+  translate(settings.artboard.x, settings.artboard.y);
+  scale(settings.artboard.zoom);
+  imageMode(CENTER);
+  rectMode(CENTER);
+
+  image(imageResult, 0, 0, settings.outputWidth, settings.outputHeight);
+
+  // Create a rectangle around the image
+  stroke('#0C8CE9');
+  noFill();
+  rect(-1, -1, settings.outputWidth + 2, settings.outputHeight + 2);
+  pop();
+}
+
+function drawPreviewImageSource(width = 200) {
+  const ratio = imageSource.height / imageSource.width;
+  push();
+  image(imageSource, 0, 0, width, width * ratio);
+  pop();
+}
+
 function render() {
   updateMemory();
   imageResult = halftone.render(imageSource, settings);
@@ -233,7 +246,7 @@ function loadGUI() {
 
   const output = gui.addFolder('Image Parameters');
   const artboard = gui.addFolder('Artboard');
-  const grid = gui.addFolder('Grid');
+  const pattern = gui.addFolder('Pattern');
   const guiExport = gui.addFolder('Export');
 
   // ZOOM Management
@@ -279,41 +292,41 @@ function loadGUI() {
     });
 
   // GRID CONTROLE
-  grid
+  pattern
     .add(settings, 'dotSize', 0.1, 60, 0.1)
     .name('Dots size')
     .onChange((value) => {
       render();
     });
-  grid
+  pattern
     .add(settings, 'minDot', 0, 100, 0.1)
     .name('Min size')
     .onChange((value) => {
       render();
     });
-  grid
+  pattern
     .add(settings, 'maxDot', 0, 100, 0.1)
     .name('Max size')
     .onChange((value) => {
       render();
     });
 
-  grid.add(settings, 'distortion', 0, 10).onChange((value) => {
+  pattern.add(settings, 'distortion', 0, 10).onChange((value) => {
     render();
   });
 
-  grid.add(settings, 'spacingX', 1, 100, 0.01).onChange((value) => {
+  pattern.add(settings, 'spacingX', 1, 100, 0.01).onChange((value) => {
     render();
   });
-  grid.add(settings, 'spacingY', 1, 100, 0.01).onChange((value) => {
+  pattern.add(settings, 'spacingY', 1, 100, 0.01).onChange((value) => {
     render();
   });
-  grid.add(settings, 'offset', 0, 1, 0.01).onChange((value) => {
+  pattern.add(settings, 'offset', 0, 1, 0.01).onChange((value) => {
     render();
   });
 
   // GRID COLORS
-  grid.add(settings, 'grayscale').onChange((value) => {
+  pattern.add(settings, 'grayscale').onChange((value) => {
     render();
   });
 
@@ -333,8 +346,13 @@ function handleDrop(file) {
     return;
   }
 
-  imageSource = loadImage(file.data);
-  render();
+  loadImage(file.data, (img) => {
+    imageSource = img;
+
+    const ratio = imageSource.height / imageSource.width;
+    settings.outputHeight = settings.outputWidth * ratio;
+    render();
+  });
 }
 
 //
