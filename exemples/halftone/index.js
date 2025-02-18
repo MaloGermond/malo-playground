@@ -382,8 +382,9 @@ function updateMemory() {
 }
 
 //
-//   Plus besoin des cookies je passe par le local storage
+//   COOKIE
 //
+// Plus besoin des cookies je passe par le local storage
 
 function setCookie(name, value, days) {
   let expires = '';
