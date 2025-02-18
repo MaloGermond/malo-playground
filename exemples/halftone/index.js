@@ -1,19 +1,22 @@
+//
 // TO DO
 //
-//  - Image storage when reload
-//  - Choose background color when exporting image
-//  - Choose artboard background color
-//  - Allow source image modification (contrast, black point, white point)
-//  - Calculate cpu performance
-//  - Optimaise halfone render perfomance
-//  - Allow CMJN export (or n colors export)
-//  - Allow export of only one channel
-//  - Allow grid rotation
-//  - Render huge image by batch biome
-//  - Allow to choose something else than dot (cross, square) for rendering
-//  - Mieux gerer les questions de ratio d'image
-//  - Ajouter un halftone Black and White avec une gestion du niveau de brightness qui deviens noir ou blanc
+// - Ajouter un mode demi-ton noir et blanc avec gestion du seuil de luminosité (prio 1)
+// - Sauvegarder l’image lors du rechargement de la page (prio 1)
+// - Optimiser les performances du rendu en demi-ton (prio 1)
+// - Rendre possible le rendu d’images très grandes en traitement par batch (prio 1)
+// - Ajouter des options de modification de l’image source (contraste, point noir, point blanc) (prio 1)
 //
+// - Permettre de choisir la couleur de fond lors de l’exportation de l’image (prio 2)
+// - Ajouter la possibilité d’exporter uniquement un canal spécifique (prio 2)
+// - Permettre l’exportation en CMJN ou en un nombre défini de couleurs (prio 2)
+// - Gérer le drop d’image en affichant une info lors du survol (prio 2)
+// - Permettre de choisir autre chose qu’un point (croix, carré…) pour le rendu (prio 2)
+// - Améliorer la gestion des ratios d’image (prio 2)
+//
+// - Analyser et afficher les performances CPU (prio 3)
+// - Ajouter une option pour faire une rotation la grille (prio 3)
+
 
 
 let settings = {
@@ -23,12 +26,12 @@ let settings = {
     backgroundColor: '#fff',
     backgroundOpacity: 100
   },
-  imageRatio: true,
-  minDot: 0,
+  lockRatio: true,
+  minDot: 10,
   maxDot: 100,
   spacingX: 10,
-  spacingY: 10,
-  offset: 5,
+  spacingY: 5,
+  offset: 0.5,
   dotSize: 30,
   grayscale: true,
   batchSize: 1000, // Taille du traitement par lot
@@ -61,6 +64,10 @@ function setup() {
   const artboard = createCanvas(windowWidth, windowHeight);
   artboard.drop(handleDrop)
   artboard.mouseWheel(handleNavigation)
+  
+  // Placer au centre l'image
+  settings.artboard.x = windowWidth/2
+  settings.artboard.y = windowHeight/2
 
   loadMemory()
   loadGUI()
@@ -73,12 +80,14 @@ function draw(){
 
   drawTransparentGrid(settings.artboard.zoom)
 
+
   push()
   translate(settings.artboard.x,settings.artboard.y)
   scale(settings.artboard.zoom)
   imageMode(CENTER);
   rectMode(CENTER)
   image(imageResult,0,0,settings.outputWidth,settings.outputHeight)
+
 
   // Create a rectangle around the image
   stroke("#0C8CE9")
@@ -117,7 +126,7 @@ function handleNavigation(event) {
 
   // Pressed cmd and scroll vertical to zoom
   if(keyIsDown(91)){
-    const zoomChange = round(clamp(settings.artboard.zoom+(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
+    const zoomChange = round(clamp(settings.artboard.zoom-(event.deltaY * 0.01),settings.artboard.zoomMin,settings.artboard.zoomMax),2)
 
     settings.artboard.zoom = zoomChange
   }else{
@@ -222,23 +231,23 @@ function loadGUI(){
 
   // OUTPUT Values
   output.add( settings, 'outputWidth').listen().onChange( value => {
-    if(settings.imageRatio) {
+    if(settings.lockRatio) {
       const ratio = Math.round(settings.outputHeight / settings.outputWidth)
-      settings.outputHeight = value * ratio
+      settings.outputHeight = Math.max(Math.round(value * ratio),50)
     }
     render()})
   output.add( settings, 'outputHeight').listen().onChange( value => {
-    if(settings.imageRatio) {
+    if(settings.lockRatio) {
       const ratio = Math.round(settings.outputHeight / settings.outputWidth)
-      settings.outputWidth = Math.round(value * ratio)
+      settings.outputWidth = Math.max(Math.round(value * ratio),50)
     }
     render()})
-  output.add( settings, 'imageRatio').onChange(value =>{render()})
+  output.add( settings, 'lockRatio').onChange(value =>{render()})
   output.addColor( settings.output, 'backgroundColor').name("Background Color").onChange(value =>{render()})
-  output.add( settings.output, 'backgroundOpacity',0,255,1).name("Background Opacity").onChange(value =>{render()})
+  output.add( settings.output, 'backgroundOpacity',0,254,1).name("Background Opacity").onChange(value =>{render()})
 
   // GRID CONTROLE
-  grid.add( settings, 'dotSize',0.1,40,0.1).name("Dots size").onChange(value =>{render()})
+  grid.add( settings, 'dotSize',0.1,60,0.1).name("Dots size").onChange(value =>{render()})
   grid.add( settings, 'minDot',0,100,0.1).name("Min size").onChange(value =>{render()})
   grid.add( settings, 'maxDot',0,100,0.1).name("Max size").onChange(value =>{render()})
 
