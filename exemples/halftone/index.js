@@ -1,6 +1,10 @@
 //
 // TO DO
 //
+// -- bugs --
+// - Le lock ratio ne respect pas le ratio. Quand on arrive dans des petits nombre le ratio fait n'importe quoi à cause des approximations
+//
+//
 // - Ajouter un mode demi-ton noir et blanc avec gestion du seuil de luminosité (prio 1)
 // - Sauvegarder l’image lors du rechargement de la page (prio 1)
 // - Optimiser les performances du rendu en demi-ton (prio 1)
@@ -16,29 +20,35 @@
 //
 // - Analyser et afficher les performances CPU (prio 3)
 // - Ajouter une option pour faire une rotation la grille (prio 3)
+//
 // - Déplacer le fond background damier en même temps que l'on se déplace
 // - Fixer le zoom du background damier quand on zoom
 // - Faire que l'on puisse zoom en direction du centre de la vue plutôt que de l'artboard.
 // - Permettre l'ajout d'un calque pour modifier/cacher la taille des points et/ou la couleur
-//
-//
+// - Resize l'artboard quand on resize la fenetre
+// - Ajouter la possibilité de copier / coller les images en cours (ajout d'une snackbar ?)
+// - Ajouter d'inclure ou non le background dans l'export
+// - Ajouter un bouton pour ajouter une image en le cherchant dans le folder plutôt que de glisser / déposer
+// - Créer un plugin figma/penpot pour convertir à la volé des images
+// - Le gradient se fait que sur la couleur, est-ce qu'il ne faut pas aussi inclure l'opacité pour le cas des dégradés d'opacité ou il y a un fond d'une seul couleur. Peut-être laisser la possibilité de choisir le mode d'interpretation (brigthness, alpha ect)
+// - Permettre de randomiser la pose des points pour qu'il n'y ai pas l'effet de sequin
 //
 
 let settings = {
-  outputWidth: 500,
-  outputHeight: 500,
+  outputWidth: 1080,
+  outputHeight: 1080,
   output: {
     backgroundColor: '#fff',
     backgroundOpacity: 100,
   },
   lockRatio: true,
-  minDot: 10,
+  minDot: 15,
   maxDot: 100,
   spacingX: 10,
   spacingY: 5,
   offset: 0.5,
-  dotSize: 30,
-  grayscale: true,
+  dotSize: 12,
+  grayscale: false,
   batchSize: 1000, // Taille du traitement par lot
   batchIndex: 0, // Stock l'étape (l'index) du traitement par lot
   distortion: 0, // Add random position to the dot
@@ -47,11 +57,11 @@ let settings = {
   artboard: {
     x: 0,
     y: 0,
-    zoom: 1,
+    zoom: 0.3,
     zoomMin: 0.1,
     zoomMax: 10,
   },
-  dbVersion: 1,
+  dbVersion: 0,
 };
 
 let isMouseOverGUI = false;
@@ -59,23 +69,29 @@ let isMouseOverGUI = false;
 let imageSource;
 let imageResult;
 
+let backgroundTile;
+
 function preload() {
   // C'est important de preload l'image car sinon les valeurs de taille de l'image n'ont pas le temps de s'initialiser.
   imageSource = loadImage('./img/Mathou 1.png');
 }
 
 function setup() {
+  console.warn('🌡️ Pensez à désactiver Add block pour ameliorer les performances !');
+
   // Charger les cookies
   const artboard = createCanvas(windowWidth, windowHeight);
   artboard.drop(handleDrop);
   artboard.mouseWheel(handleNavigation);
 
+  loadMemory();
+
+  loadGUI();
+
   // Placer au centre l'image
   settings.artboard.x = windowWidth / 2;
   settings.artboard.y = windowHeight / 2;
 
-  loadMemory();
-  loadGUI();
   imageResult = halftone.render(imageSource, settings);
 }
 
@@ -141,27 +157,34 @@ function handleNavigation(event) {
   }
 }
 
-function createTransparentGrid() {
+function createTransparentTile() {
   const size = 256;
   const squareNumber = 32;
   const squareSize = size / squareNumber;
 
-  const tile = createGraphics(size, size);
+  // Supprimer l'ancien buffer s'il existe
+  if (backgroundTile) {
+    // je check si la tuile existe deja. Si oui pas besoin d'en crée une nouvelle. Par contre si je veux pouvoir changer la couleur il va faloir faire des modifications ici.
+    return backgroundTile;
+    backgroundTile.remove();
+  }
 
-  tile.noStroke();
+  backgroundTile = createGraphics(size, size);
+
+  backgroundTile.noStroke();
 
   for (let y = 0; y < size; y += squareSize) {
     for (let x = 0; x < size; x += squareSize) {
-      tile.fill(0, 0, 0, (x / squareSize + y / squareSize) % 2 == 0 ? 50 : 100);
-      tile.rect(x, y, squareSize, squareSize);
+      backgroundTile.fill(0, 0, 0, (x / squareSize + y / squareSize) % 2 == 0 ? 50 : 100);
+      backgroundTile.rect(x, y, squareSize, squareSize);
     }
   }
 
-  return tile;
+  return backgroundTile;
 }
 
 function drawTransparentGrid(zoom) {
-  const tile = createTransparentGrid();
+  const tile = createTransparentTile();
 
   const size = map(zoom, 0.1, 10, 256, 2048, true);
 
@@ -238,6 +261,7 @@ const GUIactions = {
   },
   newFile: function () {
     localStorage.clear();
+    deleteDB('imageStore');
     location.reload();
   },
 };
@@ -355,6 +379,9 @@ function handleDrop(file) {
     return;
   }
 
+  settings.dbVersion += 1;
+  saveToDB('imageStore', settings.dbVersion, imageSource.canvas.toDataURL());
+
   loadImage(file.data, (img) => {
     imageSource = img;
 
@@ -372,20 +399,40 @@ function handleDrop(file) {
 
 // Il faut aussi une autre fonction qui à chaque changement ou tout les n (minutes) met à jours les cookies.
 
-function loadMemory() {
-  // Inicialisation de settings dans local storage. Ne charge rien
+async function loadMemory() {
+  // Initialisation de settings dans local storage. Ne charge rien
   if (localStorage.settings === undefined) {
     return;
   }
 
   settings = JSON.parse(localStorage.settings);
 
+  if (settings.dbVersion > 0) {
+    try {
+      // Attend que loadFromDB récupère les données avant de continuer
+      const imgBase64 = await loadFromDB('imageStore', settings.dbVersion);
+
+      console.log(imageSource);
+      // imageSource = loadImage(imgBase64);
+
+      // Vérifie si on a bien une image à charger
+      if (imgBase64) {
+        loadImage(imgBase64, (img) => {
+          console.log('Image loaded');
+          imageSource = img;
+        });
+        console.log(imageSource);
+      }
+    } catch (error) {
+      console.error('Erreur:', error);
+    }
+  }
+
   console.log('Memory loaded');
 }
 
 function updateMemory() {
   localStorage.setItem('settings', JSON.stringify(settings));
-  // localStorage.setItem("imageSource", imageSource.pixels)
   console.log('Memory stored');
   // console.log(localStorage)
 }
@@ -395,7 +442,7 @@ function updateMemory() {
 //
 
 //imageSource.canvas.toDataURL()
-//saveToDB('image', 1,imageSource.canvas.toDataURL()  )
+//saveToDB('imageStore', 1,imageSource.canvas.toDataURL()  )
 
 function saveToDB(storeName = 'default', version = 1, value) {
   // Ouvre une base de données avec le nom 'storeName' et la version 'version'
@@ -426,46 +473,65 @@ function saveToDB(storeName = 'default', version = 1, value) {
   };
 }
 
-// loadFromDB('image')
+// loadFromDB('imageStore')
 
+// Fonction modifiée loadFromDB pour retourner une promise
 function loadFromDB(storeName = 'default', version = 1, id = 1) {
-  // Ouvre une base de données avec le nom 'storeName' et la version 'version'
-  let request = indexedDB.open(storeName, version);
+  return new Promise((resolve, reject) => {
+    // Ouvre une base de données avec le nom 'storeName' et la version 'version'
+    let request = indexedDB.open(storeName, version);
+
+    request.onsuccess = function () {
+      // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
+      let db = request.result; // Récupère l'instance de la base de données
+
+      // Commence une transaction avec le store en mode lecture ('readonly')
+      let tx = db.transaction(storeName, 'readonly');
+
+      // Accède à l'object store du nom spécifié
+      let store = tx.objectStore(storeName);
+
+      // Demande la lecture de l'élément avec id
+      let getRequest = store.get(id);
+
+      getRequest.onsuccess = function () {
+        // Lorsque l'élément est récupéré avec succès
+        let result = getRequest.result;
+
+        if (result) {
+          console.info('Données récupérées :', { result });
+          resolve(result.data); // Résout la promise avec les données
+        } else {
+          console.info("Aucune donnée trouvée pour l'id ", id);
+          resolve(null); // Résout la promise avec null si pas de données
+        }
+      };
+
+      getRequest.onerror = function () {
+        console.error('Erreur lors de la récupération des données');
+        reject('Erreur lors de la récupération des données'); // Rejette la promise en cas d'erreur
+      };
+    };
+
+    request.onerror = function () {
+      console.error("Erreur lors de l'ouverture de la base de données");
+      reject("Erreur lors de l'ouverture de la base de données"); // Rejette la promise en cas d'erreur
+    };
+  });
+}
+
+function deleteDB(dbName) {
+  let request = indexedDB.deleteDatabase(dbName);
 
   request.onsuccess = function () {
-    // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
-    let db = request.result; // Récupère l'instance de la base de données
-
-    // Commence une transaction avec le store en mode lecture ('readonly')
-    let tx = db.transaction(storeName, 'readonly');
-
-    // Accède à l'object store du nom spécifié
-    let store = tx.objectStore(storeName);
-
-    // Demande la lecture de l'élément avec id = 1 (on suppose que l'id est 1 pour cet exemple)
-    let getRequest = store.get(id);
-
-    getRequest.onsuccess = function () {
-      // Lorsque l'élément est récupéré avec succès
-      let result = getRequest.result;
-
-      if (result) {
-        console.log('Données récupérées :', result.data); // Affiche les données de l'élément avec id = 1
-        return result.data; // Retourne les données de l'élément
-      } else {
-        console.log("Aucune donnée trouvée pour l'id ", id);
-        return null; // Si aucune donnée n'est trouvée
-      }
-    };
-
-    getRequest.onerror = function () {
-      console.error('Erreur lors de la récupération des données');
-      return null; // Si une erreur se produit
-    };
+    console.log('Database deleted successfully');
   };
 
-  request.onerror = function () {
-    console.error("Erreur lors de l'ouverture de la base de données");
-    return null; // Si une erreur se produit lors de l'ouverture de la base de données
+  request.onerror = function (event) {
+    console.error('Error deleting the database:', event.target.error);
+  };
+
+  request.onblocked = function () {
+    console.warn('Database deletion is blocked. Close all connections to the database.');
   };
 }

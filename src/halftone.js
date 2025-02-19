@@ -1,4 +1,6 @@
 const halftone = (function () {
+  let pg;
+
   function test() {
     return true;
   }
@@ -38,7 +40,8 @@ const halftone = (function () {
         x: el.x + random(0, settings.distortion), // Déformation aléatoire sur l'axe X
         y: el.y + random(0, settings.distortion), // Déformation aléatoire sur l'axe Y
         color: color, // Couleur du pixel
-        brightness: brightness(color), // Luminosité de la couleur
+        brightness: brightness(color), // Luminosité de la couleur,
+        size: map(brightness(color) * color[3], 0, 25500, 0, 254),
         alpha: color[3], // Opacité de la couleur
         mappedX: mappedX, // Position X sur l'image
         mappedY: mappedY, // Position Y sur l'image
@@ -109,7 +112,18 @@ const halftone = (function () {
       console.error('settings.imageWidth or settings.imageHeight is undefined');
     }
 
-    const pg = createGraphics(settings.outputWidth, settings.outputHeight);
+    if (!pg) {
+      console.log('Create PG');
+      pg = createGraphics(settings.outputWidth, settings.outputHeight);
+    }
+
+    // Supprimer l'ancien buffer s'il existe
+    if (pg.width !== settings.outputWidth && pg.height !== settings.outputheight) {
+      console.log('Create new PG');
+      pg.remove();
+      pg = createGraphics(settings.outputWidth, settings.outputHeight);
+    }
+
     pg.clear();
 
     // Can be clean for sure !
@@ -128,7 +142,7 @@ const halftone = (function () {
 
     pattern.scheme.map((el) => {
       const size =
-        map(el.brightness, 0, 255, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize;
+        map(el.size, 0, 254, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize;
       if (size <= 0) {
         return;
       }
@@ -156,7 +170,7 @@ const halftone = (function () {
     // Génération des cercles en demi-teinte
     pattern.scheme.forEach((el) => {
       const size =
-        map(el.brightness, 0, 255, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize;
+        map(el.size, 0, 254, settings.minDot / 100, settings.maxDot / 100) * settings.dotSize;
 
       if (size <= 0 || el.alpha === 0) {
         return;
