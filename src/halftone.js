@@ -113,13 +113,13 @@ const halftone = (function () {
     }
 
     if (!pg) {
-      console.log('Create PG');
+      // console.log('Create PG');
       pg = createGraphics(settings.outputWidth, settings.outputHeight);
     }
 
     // Supprimer l'ancien buffer s'il existe
-    if (pg.width !== settings.outputWidth && pg.height !== settings.outputheight) {
-      console.log('Create new PG');
+    if (pg.width !== settings.outputWidth || pg.height !== settings.outputheight) {
+      // console.log('Create new PG');
       pg.remove();
       pg = createGraphics(settings.outputWidth, settings.outputHeight);
     }
