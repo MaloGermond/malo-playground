@@ -215,10 +215,19 @@ function drawRenderLayer() {
   pop();
 }
 
-function drawPreviewImageSource(width = 200) {
+function drawPreviewImageSource(width = 120) {
   const ratio = imageSource.height / imageSource.width;
+  const margin = 15;
+  const padding = 4;
+
   push();
-  image(imageSource, 0, 0, width, width * ratio);
+  translate(margin, margin);
+  noStroke();
+  fill('#1F1F1F');
+  rect(0, 0, width, width * ratio);
+  fill(settings.output.backgroundColor);
+  rect(padding, padding, width - padding * 2, (width - padding * 2) * ratio);
+  image(imageSource, padding, padding, width - padding * 2, (width - padding * 2) * ratio);
   pop();
 }
 
