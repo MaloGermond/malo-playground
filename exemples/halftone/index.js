@@ -4,9 +4,7 @@
 // -- bugs --
 // - Le lock ratio ne respect pas le ratio. Quand on arrive dans des petits nombre le ratio fait n'importe quoi à cause des approximations
 //
-//
 // - Ajouter un mode demi-ton noir et blanc avec gestion du seuil de luminosité (prio 1)
-// - Sauvegarder l’image lors du rechargement de la page (prio 1)
 // - Optimiser les performances du rendu en demi-ton (prio 1)
 // - Rendre possible le rendu d’images très grandes en traitement par batch (prio 1)
 // - Ajouter des options de modification de l’image source (contraste, point noir, point blanc) -> C'est une lib ca (prio 1)
@@ -76,6 +74,7 @@ function preload() {
 
   imageSource = loadImage('./img/Mathou 1.png');
 
+  // C'est une async donc ca créer des problèmes au moement de charger la page c'est pour ca que l'on a pas la bonne image et les bon settings
   loadMemory();
 }
 
@@ -94,9 +93,9 @@ function setup() {
   settings.artboard.y = windowHeight / 2;
 
   if (base64Img) {
-    console.log(base64Img);
+    //console.log(base64Img);
     loadImage(String(base64Img), (img) => {
-      console.log(img);
+      //console.log(img);
       imageSource = img;
 
       const ratio = imageSource.height / imageSource.width;
@@ -114,7 +113,7 @@ function draw() {
 
   drawRenderLayer();
 
-  drawPreviewImageSource();
+  drawPreview();
 }
 
 function mouseDragged() {
@@ -227,19 +226,29 @@ function drawRenderLayer() {
   pop();
 }
 
-function drawPreviewImageSource(width = 120) {
+function drawPreview(width = 120) {
   const ratio = imageSource.height / imageSource.width;
   const margin = 15;
   const padding = 4;
 
+  const previewHeight = width * ratio;
+
   push();
+
   translate(margin, margin);
-  noStroke();
   fill('#1F1F1F');
   rect(0, 0, width, width * ratio);
+
+  push();
+  noStroke();
   fill(settings.output.backgroundColor);
-  rect(padding, padding, width - padding * 2, (width - padding * 2) * ratio);
-  image(imageSource, padding, padding, width - padding * 2, (width - padding * 2) * ratio);
+  rect(padding, padding, width - padding * 2, previewHeight - padding * 2);
+  image(imageSource, padding, padding, width - padding * 2, previewHeight - padding * 2);
+  pop();
+
+  translate(0, previewHeight);
+  debug.displayHistograme(width, padding);
+
   pop();
 }
 
@@ -437,6 +446,7 @@ async function loadMemory() {
 
   try {
     let imageSource = await memory.get('sourceImage');
+    console.log(base64Img);
     base64Img = imageSource.data;
     // console.log('Memory Loaded:', imageSource);
   } catch (error) {
@@ -448,7 +458,5 @@ async function loadMemory() {
 
 function updateMemory() {
   memory.set('settings', settings);
-  // localStorage.setItem('settings', JSON.stringify(settings));
   console.log('Memory stored');
-  // console.log(localStorage)
 }
