@@ -14,25 +14,51 @@ const memory = (function () {
     return dbName;
   }
 
+  async function init(dbName, version = 1) {
+    return new Promise((resolve, reject) => {
+      let request = indexedDB.open(dbName, version);
+
+      request.onupgradeneeded = function (event) {
+        let db = event.target.result;
+        verbose ? console.info('Upgrade needed for DB:', dbName) : null;
+
+        if (!db.objectStoreNames.contains(dbName)) {
+          db.createObjectStore(dbName, { keyPath: 'id' });
+          verbose ? console.info('Object store created:', dbName) : null;
+        }
+      };
+
+      request.onsuccess = function (event) {
+        let db = event.target.result;
+        db.close();
+        resolve();
+      };
+
+      request.onerror = function () {
+        reject(request.error);
+      };
+    });
+  }
+
   // Create and update
   function set(key, value, version = 1) {
-    console.info('Opening DB:', dbName, 'Version:', version);
+    verbose ? console.info('Opening DB:', dbName, 'Version:', version) : null;
 
     let request = indexedDB.open(dbName, version);
 
     request.onupgradeneeded = function (event) {
       let db = event.target.result;
-      console.info('Upgrade needed for DB:', dbName);
+      verbose ? console.info('Upgrade needed for DB:', dbName) : null;
 
       if (!db.objectStoreNames.contains(dbName)) {
         db.createObjectStore(dbName, { keyPath: 'id' });
-        console.info('Object store created:', dbName);
+        verbose ? console.info('Object store created:', dbName) : null;
       }
     };
 
     request.onsuccess = function (event) {
       let db = event.target.result;
-      console.info('DB opened successfully:', dbName);
+      verbose ? console.info('DB opened successfully:', dbName) : null;
 
       let tx = db.transaction(dbName, 'readwrite');
       let store = tx.objectStore(dbName);
@@ -40,7 +66,7 @@ const memory = (function () {
       let putRequest = store.put({ id: key, data: value });
 
       putRequest.onsuccess = function () {
-        console.info('Data saved successfully:', key, value);
+        verbose ? console.info('Data saved successfully:', key, value) : null;
       };
 
       putRequest.onerror = function () {
@@ -49,7 +75,7 @@ const memory = (function () {
 
       tx.oncomplete = function () {
         db.close(); // ⚠️ Ferme la base après la transaction pour éviter les blocages
-        console.info('Transaction complete, DB closed.');
+        verbose ? console.info('Transaction complete, DB closed.') : null;
       };
     };
 
@@ -63,41 +89,60 @@ const memory = (function () {
   }
 
   // Read
-  function get(key, version = 1) {
-    console.info('Opening DB:', dbName, 'Version:', version);
+  async function get(key, version = 1) {
+    // On S'assure que le store existe avant de faire la recherche.
+    await init(dbName, version);
 
-    let request = indexedDB.open(dbName, version);
+    return new Promise((resolve, reject) => {
+      verbose ? console.info('Opening DB:', dbName, 'Version:', version) : null;
 
-    request.onsuccess = function (event) {
-      let db = event.target.result;
-      console.info('DB opened successfully:', dbName);
+      let request = indexedDB.open(dbName, version);
 
-      let tx = db.transaction(dbName, 'readonly'); // Transaction en lecture seule
-      let store = tx.objectStore(dbName);
+      request.onsuccess = function (event) {
+        let db = event.target.result;
+        verbose ? console.info('DB opened successfully:', dbName) : null;
 
-      let getRequest = store.get(key);
+        let tx = db.transaction(dbName, 'readonly');
+        let store = tx.objectStore(dbName);
+        let getRequest = store.get(key);
 
-      getRequest.onsuccess = function () {
-        if (getRequest.result) {
-          console.info('Data retrieved successfully:', getRequest.result);
-        } else {
-          console.warn('No data found for key:', key);
+        getRequest.onsuccess = function () {
+          if (getRequest.result) {
+            verbose ? console.info('Data retrieved successfully:', getRequest.result) : null;
+            resolve(getRequest.result); // Renvoie la donnée
+          } else {
+            console.warn('No data found for key:', key);
+            db.close();
+            resolve(null); // Renvoie `null` si aucune donnée trouvée
+          }
+        };
+
+        getRequest.onerror = function () {
+          console.error('Error retrieving data:', getRequest.error);
+          reject(getRequest.error); // Rejette l'erreur
+        };
+
+        tx.oncomplete = function () {
+          db.close();
+          verbose ? console.info('Transaction complete, DB closed.') : null;
+        };
+      };
+
+      request.onupgradeneeded = function (event) {
+        let db = event.target.result;
+        verbose ? console.info('Upgrade needed for DB:', memory.dbName) : null;
+
+        if (!db.objectStoreNames.contains(memory.dbName)) {
+          db.createObjectStore(memory.dbName, { keyPath: 'id' });
+          verbose ? console.info('Object store created:', memory.dbName) : null;
         }
       };
 
-      getRequest.onerror = function () {
-        console.error('Error retrieving data:', getRequest.error);
+      request.onerror = function () {
+        console.error('Error opening DB:', request.error);
+        reject(request.error); // Rejette l'erreur si la DB ne s'ouvre pas
       };
-
-      tx.oncomplete = function () {
-        db.close(); // Ferme la base après la transaction
-        console.info('Transaction complete, DB closed.');
-      };
-    };
-
-    request.onerror = function () {
-      console.error('Error opening DB:', request.error);
-    };
+    });
   }
 
   // Delete
@@ -105,7 +150,7 @@ const memory = (function () {
     let request = indexedDB.deleteDatabase(key);
 
     request.onsuccess = function () {
-      console.log('Database deleted successfully');
+      verbose ? console.info('Database deleted successfully') : null;
     };
 
     request.onerror = function (event) {

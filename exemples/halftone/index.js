@@ -73,7 +73,10 @@ let backgroundTile;
 
 function preload() {
   // C'est important de preload l'image car sinon les valeurs de taille de l'image n'ont pas le temps de s'initialiser.
+
   imageSource = loadImage('./img/Mathou 1.png');
+
+  loadMemory();
 }
 
 function setup() {
@@ -84,14 +87,23 @@ function setup() {
   artboard.drop(handleDrop);
   artboard.mouseWheel(handleNavigation);
 
-  loadMemory();
-
   loadGUI();
 
   // Placer au centre l'image
   settings.artboard.x = windowWidth / 2;
   settings.artboard.y = windowHeight / 2;
 
+  if (base64Img) {
+    console.log(base64Img);
+    loadImage(String(base64Img), (img) => {
+      console.log(img);
+      imageSource = img;
+
+      const ratio = imageSource.height / imageSource.width;
+      settings.outputHeight = settings.outputWidth * ratio;
+      render();
+    });
+  }
   imageResult = halftone.render(imageSource, settings);
 }
 
@@ -269,8 +281,8 @@ const GUIactions = {
     localStorage.clear();
   },
   newFile: function () {
-    localStorage.clear();
-    deleteDB('imageStore');
+    // localStorage.clear();
+    memory.clear();
     location.reload();
   },
 };
@@ -388,8 +400,7 @@ function handleDrop(file) {
     return;
   }
 
-  settings.dbVersion += 1;
-  saveToDB('imageStore', settings.dbVersion, imageSource.canvas.toDataURL());
+  memory.set('sourceImage', file.data);
 
   loadImage(file.data, (img) => {
     imageSource = img;
@@ -408,139 +419,36 @@ function handleDrop(file) {
 
 // Il faut aussi une autre fonction qui à chaque changement ou tout les n (minutes) met à jours les cookies.
 
+let base64Img;
+
+// Il faut séparer le load settings du loadImageMemory pour que ce soit plus clean
 async function loadMemory() {
   // Initialisation de settings dans local storage. Ne charge rien
-  if (localStorage.settings === undefined) {
-    return;
+
+  memory.setName('halftone');
+
+  try {
+    let promise = await memory.get('settings');
+    settings = promise.data;
+    // console.log('Memory Loaded:', data);
+  } catch (error) {
+    console.warn('Error loading memory:', error);
   }
 
-  settings = JSON.parse(localStorage.settings);
-
-  if (settings.dbVersion > 0) {
-    try {
-      // Attend que loadFromDB récupère les données avant de continuer
-      const imgBase64 = await loadFromDB('imageStore', settings.dbVersion);
-
-      console.log(imageSource);
-      // imageSource = loadImage(imgBase64);
-
-      // Vérifie si on a bien une image à charger
-      if (imgBase64) {
-        loadImage(imgBase64, (img) => {
-          console.log('Image loaded');
-          imageSource = img;
-        });
-        console.log(imageSource);
-      }
-    } catch (error) {
-      console.error('Erreur:', error);
-    }
+  try {
+    let imageSource = await memory.get('sourceImage');
+    base64Img = imageSource.data;
+    // console.log('Memory Loaded:', imageSource);
+  } catch (error) {
+    console.warn('Error loading memory:', error);
   }
 
   console.log('Memory loaded');
 }
 
 function updateMemory() {
-  localStorage.setItem('settings', JSON.stringify(settings));
+  memory.set('settings', settings);
+  // localStorage.setItem('settings', JSON.stringify(settings));
   console.log('Memory stored');
   // console.log(localStorage)
-}
-
-//
-// IndexedDB
-//
-
-//imageSource.canvas.toDataURL()
-//saveToDB('imageStore', 1,imageSource.canvas.toDataURL()  )
-
-function saveToDB(storeName = 'default', version = 1, value) {
-  // Ouvre une base de données avec le nom 'storeName' et la version 'version'
-  let request = indexedDB.open(storeName, version);
-
-  request.onupgradeneeded = function () {
-    // Lorsque la base de données est créée ou mise à jour, cette fonction est appelée
-    let db = request.result; // Récupère l'instance de la base de données
-
-    // Crée un object store dans la base de données. Le nom est 'storeName' (par défaut 'test')
-    if (!db.objectStoreNames.contains(storeName)) {
-      db.createObjectStore(storeName, { keyPath: 'id' });
-    }
-  };
-
-  request.onsuccess = function () {
-    // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
-    let db = request.result; // Récupère l'instance de la base de données
-
-    // Commence une transaction avec le store 'storeName' en mode 'readwrite'
-    let tx = db.transaction(storeName, 'readwrite'); // Le nom du store est 'storeName' (pas 'store')
-
-    // Problème ici : tu utilises à nouveau le nom 'store', qui fait référence à la variable du paramètre et à la variable de la transaction
-    let store = tx.objectStore(storeName); // Cette ligne pose problème car le nom de la variable est le même que le paramètre 'storeName', créant une confusion
-
-    // On insère des données dans le store en utilisant un objet avec un id et les données à insérer
-    store.put({ id: 1, data: value }); // Ajoute un élément avec id 1 et les données passées à la fonction
-  };
-}
-
-// loadFromDB('imageStore')
-
-// Fonction modifiée loadFromDB pour retourner une promise
-function loadFromDB(storeName = 'default', version = 1, id = 1) {
-  return new Promise((resolve, reject) => {
-    // Ouvre une base de données avec le nom 'storeName' et la version 'version'
-    let request = indexedDB.open(storeName, version);
-
-    request.onsuccess = function () {
-      // Lorsque la base de données est ouverte avec succès, cette fonction est appelée
-      let db = request.result; // Récupère l'instance de la base de données
-
-      // Commence une transaction avec le store en mode lecture ('readonly')
-      let tx = db.transaction(storeName, 'readonly');
-
-      // Accède à l'object store du nom spécifié
-      let store = tx.objectStore(storeName);
-
-      // Demande la lecture de l'élément avec id
-      let getRequest = store.get(id);
-
-      getRequest.onsuccess = function () {
-        // Lorsque l'élément est récupéré avec succès
-        let result = getRequest.result;
-
-        if (result) {
-          console.info('Données récupérées :', { result });
-          resolve(result.data); // Résout la promise avec les données
-        } else {
-          console.info("Aucune donnée trouvée pour l'id ", id);
-          resolve(null); // Résout la promise avec null si pas de données
-        }
-      };
-
-      getRequest.onerror = function () {
-        console.error('Erreur lors de la récupération des données');
-        reject('Erreur lors de la récupération des données'); // Rejette la promise en cas d'erreur
-      };
-    };
-
-    request.onerror = function () {
-      console.error("Erreur lors de l'ouverture de la base de données");
-      reject("Erreur lors de l'ouverture de la base de données"); // Rejette la promise en cas d'erreur
-    };
-  });
-}
-
-function deleteDB(dbName) {
-  let request = indexedDB.deleteDatabase(dbName);
-
-  request.onsuccess = function () {
-    console.log('Database deleted successfully');
-  };
-
-  request.onerror = function (event) {
-    console.error('Error deleting the database:', event.target.error);
-  };
-
-  request.onblocked = function () {
-    console.warn('Database deletion is blocked. Close all connections to the database.');
-  };
 }

@@ -1,7 +1,19 @@
-function setup() {
+async function setup() {
   createCanvas(windowWidth, windowHeight);
   memory.setName('users');
+  await loadMemory();
+  console.log('Loaded');
   GUI();
+}
+
+async function loadMemory() {
+  try {
+    let data = await memory.get('Alain');
+    console.log('Memory Loaded:', data);
+  } catch (error) {
+    console.warn('Error loading memory:', error);
+  }
+  return;
 }
 
 function draw() {
@@ -32,41 +44,4 @@ function GUI() {
   gui.add(setting, 'key').name('Key');
   gui.add(setting, 'value').name('Value');
   gui.add(setting, 'version', 1, 100, 1).name('Version');
-}
-
-function DBget(dbName, key, version = 1) {
-  console.info('Opening DB:', dbName, 'Version:', version);
-
-  let request = indexedDB.open(dbName, version);
-
-  request.onsuccess = function (event) {
-    let db = event.target.result;
-    console.info('DB opened successfully:', dbName);
-
-    let tx = db.transaction(dbName, 'readonly'); // Transaction en lecture seule
-    let store = tx.objectStore(dbName);
-
-    let getRequest = store.get(key);
-
-    getRequest.onsuccess = function () {
-      if (getRequest.result) {
-        console.info('Data retrieved successfully:', getRequest.result);
-      } else {
-        console.warn('No data found for key:', key);
-      }
-    };
-
-    getRequest.onerror = function () {
-      console.error('Error retrieving data:', getRequest.error);
-    };
-
-    tx.oncomplete = function () {
-      db.close(); // Ferme la base après la transaction
-      console.info('Transaction complete, DB closed.');
-    };
-  };
-
-  request.onerror = function () {
-    console.error('Error opening DB:', request.error);
-  };
 }
