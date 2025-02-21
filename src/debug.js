@@ -1,3 +1,10 @@
+//
+// DEBUG LIB
+//
+
+// Currently it's a quite dirty lib.
+// I want a widget that display performance informations
+
 const debug = (function () {
 	const data = new Array();
 	let maxDataLength = 100;
