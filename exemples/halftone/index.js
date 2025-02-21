@@ -24,12 +24,13 @@
 // - Faire que l'on puisse zoom en direction du centre de la vue plutôt que de l'artboard.
 // - Permettre l'ajout d'un calque pour modifier/cacher la taille des points et/ou la couleur
 // - Resize l'artboard quand on resize la fenetre
-// - Ajouter la possibilité de copier / coller les images en cours (ajout d'une snackbar ?)
+// - Ajouter la possibilité de copier / coller les images en cours (ajout d'une snackbar/toast ?)
 // - Ajouter d'inclure ou non le background dans l'export
 // - Ajouter un bouton pour ajouter une image en le cherchant dans le folder plutôt que de glisser / déposer
 // - Créer un plugin figma/penpot pour convertir à la volé des images
 // - Le gradient se fait que sur la couleur, est-ce qu'il ne faut pas aussi inclure l'opacité pour le cas des dégradés d'opacité ou il y a un fond d'une seul couleur. Peut-être laisser la possibilité de choisir le mode d'interpretation (brigthness, alpha ect)
 // - Permettre de randomiser la pose des points pour qu'il n'y ai pas l'effet de sequin
+// - Ajouter des
 //
 
 let settings = {
@@ -40,8 +41,8 @@ let settings = {
     backgroundOpacity: 100,
   },
   lockRatio: true,
-  minDot: 15,
-  maxDot: 100,
+  minDot: 90,
+  maxDot: 6,
   spacingX: 10,
   spacingY: 5,
   offset: 0.5,
@@ -55,7 +56,7 @@ let settings = {
   artboard: {
     x: 0,
     y: 0,
-    zoom: 0.3,
+    zoom: 0.5,
     zoomMin: 0.1,
     zoomMax: 10,
   },
@@ -63,6 +64,8 @@ let settings = {
 };
 
 let isMouseOverGUI = false;
+
+let dotsDisplay;
 
 let imageSource;
 let imageResult;
@@ -247,7 +250,7 @@ function drawPreview(width = 120) {
   pop();
 
   translate(0, previewHeight);
-  debug.displayHistograme(width, padding);
+  debug.displayHistograme(width);
 
   pop();
 }
