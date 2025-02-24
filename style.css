@@ -78,8 +78,16 @@ canvas {
   flex-direction: rows;
 }
 
+.wrap {
+  flex-wrap: wrap;
+}
+
 .cover {
   object-fit: cover;
+}
+
+.scroll {
+  overflow: scroll;
 }
 
 code {

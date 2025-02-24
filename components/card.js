@@ -21,6 +21,8 @@ class ProjectCard extends HTMLElement {
 
           background: #F3F3F3;
           background-image: url("${path}/cover.png");
+          background-position: center;
+          background-repeat: no-repeat;
           background-size: cover;
           border: 4px solid #FFFFFF;
           border-radius: 0.5rem;
@@ -51,6 +53,10 @@ class ProjectCard extends HTMLElement {
         .card:hover a{
           opacity: 1;
           transform: translateY(0%) scale(1);
+        }
+
+        .card:hover{
+          cursor: pointer;
         }
 
       </style>

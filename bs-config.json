@@ -1,11 +1,13 @@
 {
   "server": {
-    "baseDir": ["./", "./exemples/projet"]
+    "baseDir": ["./", "./exemples/projet"],
+    "port": 3000,
+    "host": "0.0.0.0",
+    "routes": {
+      "/projet": "./exemples/projet"
+    }
   },
   "files": ["./**/*.{html,css,js}"],
   "notify": false,
-  "reloadDelay": 500,
-  "server.routes": {
-    "/projet": "./exemples/projet"
-  }
+  "reloadDelay": 500
 }
