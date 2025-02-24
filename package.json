@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "lite-server",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "new": "node scripts/newProject.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,6 +19,7 @@
     "prettier": "^3.5.1"
   },
   "dependencies": {
+    "fs-extra": "^11.3.0",
     "lil-gui": "^0.20.0"
   }
 }

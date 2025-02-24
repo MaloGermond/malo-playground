@@ -99,15 +99,17 @@ const grid = (function () {
 
   function display() {
     noFill();
-    stroke(0);
+
+    stroke('#3FBCE7');
     rect(0, 0, config.width, config.height);
 
-    stroke(180);
+    stroke('#6E9BAC');
     displayCells();
 
     translate(config.marginLeft, config.marginTop);
     push();
-    stroke(200);
+
+    stroke('#2DC9FF');
     rect(
       0,
       0,

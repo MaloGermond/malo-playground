@@ -82,12 +82,40 @@ canvas {
   flex-wrap: wrap;
 }
 
+.gap-050 {
+  gap: 0.25rem;
+}
+
+.gap-100 {
+  gap: 0.5rem;
+}
+
+.gap-200 {
+  gap: 1rem;
+}
+
+.margin-050 {
+  margin: 0.25rem;
+}
+
+.margin-100 {
+  margin: 0.5rem;
+}
+
+.margin-200 {
+  margin: 1rem;
+}
+
 .cover {
   object-fit: cover;
 }
 
 .scroll {
   overflow: scroll;
+}
+
+.background {
+  background-color: #f3f9f7;
 }
 
 code {
