@@ -11,7 +11,7 @@ const debug = (function () {
 	let maxValue = 100;
 
 	// Draw et Display c'est différent. Ici on draw ... Donc faut faire une autre fonction display
-	function displayHistograme(width, value = '') {
+	function displayHistograme(width) {
 		const margin = 15;
 		const padding = 4;
 
@@ -45,8 +45,8 @@ const debug = (function () {
 		fill('#fff');
 		textAlign(LEFT);
 		text(frameRate().toFixed(0) + ' fps', padding, 0);
-		// textAlign(RIGHT);
-		// text(value, width - padding * 3, 0);
+		textAlign(RIGHT);
+		text(deltaTime.toFixed(0), width - padding * 3, 0);
 		pop();
 		pop();
 		pop();

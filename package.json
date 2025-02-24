@@ -1,7 +1,7 @@
 {
   "name": "motion",
   "version": "1.0.0",
-  "description": "The Motion library provides a simple and versatile tool for handling animations with P5JS. It allows you to animate properties of JavaScript objects smoothly over time.",
+  "description": "A laboratory for my digital project",
   "main": "index.js",
   "type": "module",
   "directories": {

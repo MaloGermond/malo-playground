@@ -16,7 +16,6 @@
 // - Permettre de choisir autre chose qu’un point (croix, carré…) pour le rendu (prio 2)
 // - Améliorer la gestion des ratios d’image (prio 2)
 //
-// - Analyser et afficher les performances CPU (prio 3)
 // - Ajouter une option pour faire une rotation la grille (prio 3)
 //
 // - Déplacer le fond background damier en même temps que l'on se déplace
@@ -30,7 +29,7 @@
 // - Créer un plugin figma/penpot pour convertir à la volé des images
 // - Le gradient se fait que sur la couleur, est-ce qu'il ne faut pas aussi inclure l'opacité pour le cas des dégradés d'opacité ou il y a un fond d'une seul couleur. Peut-être laisser la possibilité de choisir le mode d'interpretation (brigthness, alpha ect)
 // - Permettre de randomiser la pose des points pour qu'il n'y ai pas l'effet de sequin
-// - Ajouter des
+//
 //
 
 let settings = {
