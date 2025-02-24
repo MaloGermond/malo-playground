@@ -9,36 +9,16 @@
     />
     <title>Poster experiences</title>
     <link rel="stylesheet" href="./style.css" />
-    <script type="module" src="./components/card.js"></script>
   </head>
 
-  <body class="flex flex-column m-w-900">
-    <projectCard>Changing</projectCard>
-    <h1 class="header-600 m-w-500">
+  <body class="flex-column m-w-900">
+    <h1 class="header-300 m-w-500">
       <span class="medium">A place where I can</span> experiment
       <span class="medium">with</span> interactions <span class="medium">and uses</span>
     </h1>
-    <section>
-      <h2 class="header-300">Halftone experiences</h2>
-      <div class="flex">
-        <article class="card-project w-400">
-          <img src="./assets/thumbnails/grid-pattern.png" class="cover w-300" />
-          <h3>Halftone tool</h3>
-          <a href="http://localhost:3000/exemples/halftone/index.html">Grid pattern</a>
-          <code>http://192.168.1.125:3000/exemples/grid pattern/index.html</code>
-        </article>
-      </div>
-    </section>
-    <section>
-      <h2 class="header-300">Curves</h2>
-      <div class="flex">
-        <article class="card-project w-400">
-          <img src="./assets/thumbnails/grid-pattern.png" class="cover w-300" />
-          <h3>Controle shape</h3>
-          <a href="http://localhost:3000/exemples/pointManager/index.html">Point Manager</a>
-          <code>http://192.168.1.125:3000/exemples/pointManager/index.html</code>
-        </article>
-      </div>
+    <section class="flex-row">
+      <project-card project="halftone">Halftone</project-card>
+      <project-card project="starter">Starter</project-card>
     </section>
     <!--  <section class="menu">
     <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
@@ -46,6 +26,7 @@
     <script src="../../src/motion.js"></script>
     <script src="../../src/ease.js"></script>
     <script src="../../src/grid.js"></script>
+    <script type="module" src="./components/card.js"></script>
     <script src="index.js"></script>
   </body>
 </html>

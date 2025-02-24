@@ -64,15 +64,17 @@ canvas {
   max-width: 128px;
 }
 
-.flew {
+.flex {
   display: flex;
 }
 
 .flex-column {
+  display: flex;
   flex-direction: column;
 }
 
 .flex-row {
+  display: flex;
   flex-direction: rows;
 }
 
