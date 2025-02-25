@@ -26,6 +26,8 @@ class ProjectCard extends HTMLElement {
           background-size: cover;
           border: 4px solid #FFFFFF;
           border-radius: 0.5rem;
+
+          overflow:hidden;
         }
 
         slot{

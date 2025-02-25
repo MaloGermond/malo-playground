@@ -3,6 +3,14 @@
 const page = grid;
 const settings = {
   displayGrid: false,
+  column: 5,
+  row: 3,
+  rowGap: 3,
+  columnGap: 5,
+  marginTop: 20,
+  marginLeft: 20,
+  marginRight: 20,
+  marginBottom: 20,
 };
 let instance = {};
 const images = new Array();
@@ -13,14 +21,8 @@ function preload() {
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  page.define({
-    width: windowWidth - 15,
-    height: windowHeight - 15,
-    column: 5,
-    row: 3,
-    rowGap: 4,
-    columnGap: 4,
-  });
+  renderGrid();
+  loadGUI();
 }
 
 function draw() {
@@ -33,8 +35,21 @@ function draw() {
   settings.displayGrid ? page.display() : null;
 }
 
-function mousePressed() {
-  settings.displayGrid = true;
+function mousePressed() {}
+
+function renderGrid() {
+  page.define({
+    width: windowWidth - 15,
+    height: windowHeight - 15,
+    column: settings.column,
+    row: settings.row,
+    rowGap: settings.rowGap,
+    columnGap: settings.columnGap,
+    marginTop: settings.marginTop,
+    marginLeft: settings.marginLeft,
+    marginRight: settings.marginRight,
+    marginBottom: settings.marginBottom,
+  });
 }
 
 function loadImages(size) {
@@ -58,4 +73,59 @@ function displayImage(img, settings) {
   endClip();
   image(img, settings.position.x, settings.position.y, img.width, img.height);
   pop();
+}
+
+function loadGUI() {
+  const GUI = lil.GUI;
+  const gui = new GUI();
+
+  gui.add(settings, 'displayGrid').name('Show grid');
+  gui
+    .add(settings, 'column', 1, 30, 1)
+    .name('Column')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'row', 1, 30, 1)
+    .name('Row')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'rowGap', 1, 30, 1)
+    .name('Gap Column')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'columnGap', 1, 30, 1)
+    .name('Gap Column')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'marginTop')
+    .name('Margin Top')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'marginLeft')
+    .name('Margin Left')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'marginBottom')
+    .name('Margin Bottom')
+    .onChange((value) => {
+      renderGrid();
+    });
+  gui
+    .add(settings, 'marginLeft')
+    .name('Margin Left')
+    .onChange((value) => {
+      renderGrid();
+    });
 }
