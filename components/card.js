@@ -4,7 +4,8 @@ class ProjectCard extends HTMLElement {
     this.attachShadow({ mode: 'open' }); // Shadow DOM
     this.project = String(this.getAttribute('project')) || '';
     const path = './exemples/' + this.project;
-    const slug = 'http://localhost:3000/exemples/' + this.project + '/index.html';
+    const origin = window.location.origin;
+    const slug = origin + '/exemples/' + this.project + '/index.html';
 
     this.shadowRoot.innerHTML = `
       <style>
