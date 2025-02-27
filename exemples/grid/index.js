@@ -21,6 +21,17 @@ const settings = {
   marginBottom: 10,
 };
 
+const guiActions = {
+  addColumn: function () {
+    settings.columns.push('fr');
+    renderGrid();
+  },
+  addRow: function () {
+    settings.rows.push('fr');
+    renderGrid();
+  },
+};
+
 let instance = {};
 const images = new Array();
 
@@ -39,15 +50,15 @@ function draw() {
   background('#F8F9FA');
 
   // images.map((el) => {
-  //   displayImage(el.src, page.getCell(el.x, el.y)[0]);
+  //   displayImage(el.src, grid.getCell(el.x, el.y)[0]);
   // });
   settings.displayGrid ? grid.display() : null;
-  // console.log(page.getCell(mouseX, mouseY));
+  // console.log(grid.getCell(mouseX, mouseY));
   debug.displayHistograme(150);
 }
 
 function mousePressed() {
-  loadImages(10);
+  // loadImages(10);
 }
 
 function renderGrid() {
@@ -94,18 +105,8 @@ function loadGUI() {
     .onChange((value) => {
       renderGrid();
     });
-  // gui
-  //   .add(settings, 'column', 1, 100, 1)
-  //   .name('Column')
-  //   .onChange((value) => {
-  //     renderGrid();
-  //   });
-  // gui
-  //   .add(settings, 'row', 1, 100, 1)
-  //   .name('Row')
-  //   .onChange((value) => {
-  //     renderGrid();
-  //   });
+  gui.add(guiActions, 'addColumn').name('New Column');
+  gui.add(guiActions, 'addRow').name('New Row');
   gui
     .add(settings, 'rowGap', 0, 30, 1)
     .name('Gap Row')
