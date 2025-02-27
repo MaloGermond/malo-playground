@@ -1,22 +1,31 @@
+//
+//  GRID SHOWCASE
+//
+//
+//  Here's a demonstration of what's possible with grid lib
+//
+
 //import motion from "./src/motion.js"
 
-const page = grid;
 const settings = {
-  displayGrid: false,
-  column: 5,
-  row: 3,
+  displayGrid: true,
+  width: 700,
+  height: 500,
+  columns: ['fr', 'fr', 100, 'fr', 22.4, '10%', 'fr'],
+  rows: ['5%', 'fr', 50, 'fr', '5%'],
   rowGap: 3,
   columnGap: 5,
-  marginTop: 20,
-  marginLeft: 20,
-  marginRight: 20,
-  marginBottom: 20,
+  marginTop: 10,
+  marginLeft: 10,
+  marginRight: 10,
+  marginBottom: 10,
 };
+
 let instance = {};
 const images = new Array();
 
 function preload() {
-  loadImages(10);
+  // loadImages(10);
 }
 
 function setup() {
@@ -29,27 +38,20 @@ function draw() {
   // noCursor()
   background('#F8F9FA');
 
-  images.map((el) => {
-    displayImage(el.src, page.getCell(el.x, el.y)[0]);
-  });
-  settings.displayGrid ? page.display() : null;
+  // images.map((el) => {
+  //   displayImage(el.src, page.getCell(el.x, el.y)[0]);
+  // });
+  settings.displayGrid ? grid.display() : null;
+  // console.log(page.getCell(mouseX, mouseY));
+  debug.displayHistograme(150);
 }
 
-function mousePressed() {}
+function mousePressed() {
+  loadImages(10);
+}
 
 function renderGrid() {
-  page.define({
-    width: windowWidth - 15,
-    height: windowHeight - 15,
-    column: settings.column,
-    row: settings.row,
-    rowGap: settings.rowGap,
-    columnGap: settings.columnGap,
-    marginTop: settings.marginTop,
-    marginLeft: settings.marginLeft,
-    marginRight: settings.marginRight,
-    marginBottom: settings.marginBottom,
-  });
+  grid.create(settings);
 }
 
 function loadImages(size) {
@@ -81,25 +83,37 @@ function loadGUI() {
 
   gui.add(settings, 'displayGrid').name('Show grid');
   gui
-    .add(settings, 'column', 1, 30, 1)
-    .name('Column')
+    .add(settings, 'width', 1, 1000, 1)
+    .name('Width')
     .onChange((value) => {
       renderGrid();
     });
   gui
-    .add(settings, 'row', 1, 30, 1)
-    .name('Row')
+    .add(settings, 'height', 1, 1000, 1)
+    .name('Height')
+    .onChange((value) => {
+      renderGrid();
+    });
+  // gui
+  //   .add(settings, 'column', 1, 100, 1)
+  //   .name('Column')
+  //   .onChange((value) => {
+  //     renderGrid();
+  //   });
+  // gui
+  //   .add(settings, 'row', 1, 100, 1)
+  //   .name('Row')
+  //   .onChange((value) => {
+  //     renderGrid();
+  //   });
+  gui
+    .add(settings, 'rowGap', 0, 30, 1)
+    .name('Gap Row')
     .onChange((value) => {
       renderGrid();
     });
   gui
-    .add(settings, 'rowGap', 1, 30, 1)
-    .name('Gap Column')
-    .onChange((value) => {
-      renderGrid();
-    });
-  gui
-    .add(settings, 'columnGap', 1, 30, 1)
+    .add(settings, 'columnGap', 0, 30, 1)
     .name('Gap Column')
     .onChange((value) => {
       renderGrid();
@@ -111,8 +125,8 @@ function loadGUI() {
       renderGrid();
     });
   gui
-    .add(settings, 'marginLeft')
-    .name('Margin Left')
+    .add(settings, 'marginRight')
+    .name('Margin Right')
     .onChange((value) => {
       renderGrid();
     });

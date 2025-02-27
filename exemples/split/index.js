@@ -1,3 +1,10 @@
+//
+//
+//
+//
+//  Purpose of this place is to being able to split a rect shape indefinitly and being able to change their shape.
+//
+
 const instance = {
   x: 100,
   y: 100,

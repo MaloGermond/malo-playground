@@ -1,29 +1,30 @@
+//
+//  SHADERS
+//
+//
+//  Purpose of this place is to understand how works shaders
+//
+
 let src;
 let preview;
-let shaderLum;
 
 function preload() {
   src = loadImage('./stairs-clean.jpg');
   src.loadPixels();
-  shaderLum = loadShader('luminosity.vert', 'luminosity.frag');
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  shader(shaderLum);
-  shaderLum.setUniform('tex', src);
+  createCanvas(windowWidth, windowHeight, WEGL);
 }
 
 function draw() {
   background('#F3F9F7'); //  Ajout d'un fond pour éviter les traînées
-  rect(-width / 2, -height / 2, width, height);
-  // debug.displayHistograme(150);
+  debug.displayHistograme(150);
 }
 
 function mousePressed() {}
 
 // Il se passe quoi si j'ai un tableau sous forme [pvector2 pos, pvector4 color]
-// -> Shaders
 
 function updateImg(value) {
   // console.log(value);

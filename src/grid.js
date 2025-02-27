@@ -1,103 +1,150 @@
+//
+//  GRID LIBRARIES
+//
+//
+//  An easy to manage complex grid.
+//
+
+//  TODO
+//
+// - Dans getCell ajouter la cellule la plus proche quand on est dans la marge ou le gap. Actuellement ca renvois aucun objet.
+//  - Dans getNeighbour permettre de connaitre les cellules voisine de la cellule.
+//  - Ajouter la possibilité d'avoir des colonnes de taille variable.
+//  - Mieux gerer la definiton de la fonction, car là j'ai trop de ligne je ne peux pas facilement rajouter des variables.
+//  - Réecrire la function computeSize pour que ce soit moins verbeux
+//  - Gerer les cas nfr car aujourd'hui on ne peut prendre qu'une fraction
+
 const grid = (function () {
-  let config = {};
+  let config = {
+    x: 0,
+    y: 0,
+    width: 200,
+    height: 200,
+    innerWidth: undefined,
+    innerHeight: undefined,
+    marginTop: 20,
+    marginLeft: 20,
+    marginBottom: 20,
+    marginRight: 20,
+    rowGap: 4,
+    columnGap: 4,
+    rows: ['fr', 'fr'],
+    rowsHeight: [],
+    columns: ['fr', 'fr', 'fr'],
+    columnsWidth: [],
+    cells: [],
+  };
 
   let cells = new Array();
 
   // Define the grid config
-  function define(options) {
-    options == undefined ? (options = '') : null;
+  function create(args = {}) {
+    config = { ...config, ...args };
 
-    const x = options.x == undefined ? 0 : options.x;
-    const y = options.y == undefined ? 0 : options.y;
+    // Dimensions internes sans les marges
+    config.innerWidth = config.width - config.marginLeft - config.marginRight;
+    config.innerHeight = config.height - config.marginTop - config.marginBottom;
 
-    const width = options.width == undefined ? 200 : options.width;
-    const height = options.height == undefined ? 200 : options.height;
+    // Calcul des tailles des colonnes et lignes
+    // Combiner la fonction computeSizeRemaining et computeFraction dns computeSizes pour plus d'efficacité car ce sont les mêmes arguments qui sont appeler ce qui fait que c'est redondant
+    config.widthRemaining = computeSizeRemaining(
+      config.innerWidth,
+      config.columns,
+      config.columnGap
+    );
+    config.widthFraction = computeFraction(config.widthRemaining, config.columns);
 
-    const marginTop = options.marginTop == undefined ? 20 : options.marginTop;
-    const marginLeft = options.marginLeft == undefined ? 20 : options.marginLeft;
-    const marginBottom = options.marginBottom == undefined ? 20 : options.marginBottom;
-    const marginRight = options.marginRight == undefined ? 20 : options.marginRight;
+    config.heightRemaining = computeSizeRemaining(config.innerHeight, config.rows, config.rowGap);
+    config.heightFraction = computeFraction(config.heightRemaining, config.rows);
 
-    const innerWidth = width - marginLeft - marginRight;
-    const innerHeight = height - marginTop - marginBottom;
+    config.columnsWidth = computeSize(config.columns, config.widthFraction, config.innerWidth);
+    config.rowsHeight = computeSize(config.rows, config.heightFraction, config.innerHeight);
 
-    const rowGap = options.rowGap == undefined ? 4 : options.rowGap;
-    const columnGap = options.columnGap == undefined ? 4 : options.columnGap;
+    // Génération des cellules
+    config.cells = computeCells();
 
-    let row;
-    let rowHeight;
+    console.log(config);
 
-    if (options.row == undefined && options.rowHeight == undefined) {
-      row = 2;
-      rowHeight = (innerHeight - (row - 1) * rowGap) / row;
-    }
-    if (options.row != undefined) {
-      row = options.row;
-      rowHeight = (innerHeight - (row - 1) * rowGap) / row;
-    }
-    if (options.rowHeight != undefined) {
-      rowHeight = options.rowHeight;
-      row = (innerHeight + rowGap) / (rowHeight + rowGap);
-    }
+    return config;
+  }
 
-    let column;
-    let columnWidth;
+  // Retourne l'espace restant en largeur.
+  function computeSizeRemaining(size, array, gap) {
+    const clutter = array.reduce((acc, val) => {
+      if (typeof val !== 'number') {
+        if (val.includes('%')) {
+          const percentage = parseFloat(val) / 100;
+          return acc + size * percentage;
+        }
+        return acc;
+      }
+      return acc + val;
+    }, 0);
+    const remainingSize = size - clutter - gap * (array.length - 1);
+    return remainingSize;
+  }
 
-    if (options.column == undefined && options.columnWidth == undefined) {
-      column = 2;
-      columnWidth = (innerWidth - (column - 1) * columnGap) / column;
-    }
-    if (options.column != undefined) {
-      column = options.column;
-      columnWidth = (innerWidth - (column - 1) * columnGap) / column;
-    }
-    if (options.columnWidth != undefined) {
-      columnWidth = options.columnWidth;
-      column = (innerHeight + columnGap) / (columnWidth + columnGap);
-    }
+  // Retourne la valeur d'une fraction de l'espace restant.
+  function computeFraction(remain, array) {
+    // je prend pas ici en compte le fait que l'on puisse avoir n fr
+    // Il faut prendre en compte la marge ici.
+    // Pour une valeur fr on retire la marge mais pas pour du int ou % (car valeur fixe) Si que fixe alors on déborde ?
+    // le nombre de marge est égale au nombre d'éléments dans la grille -1
+    const columnLength = array.filter((val) => val === 'fr').length;
 
+    const frSize = remain / columnLength;
+
+    return frSize;
+  }
+
+  // Retourn le tableau de la largeur de chaque columns
+  function computeSize(array, fr, innerSize) {
+    const sizes = array.map((val) => {
+      if (val == 'fr') {
+        return fr;
+      }
+
+      if (typeof val == 'string') {
+        const percentage = parseFloat(val) / 100;
+        return innerSize * percentage;
+      }
+      return val;
+    });
+
+    return sizes;
+  }
+
+  function computeCells() {
     const cells = new Array();
-    for (let j = 0; j < row; j++) {
-      for (let i = 0; i < column; i++) {
+
+    let x = 0;
+    let y = 0;
+
+    for (let j = 0; j < config.rows.length; j++) {
+      x = 0;
+      for (let i = 0; i < config.columns.length; i++) {
         cells.push({
-          index: i + j * column,
+          index: i + j * config.columns.length,
           column: i,
           row: j,
           position: {
-            x: i * (columnWidth + columnGap) + marginLeft,
-            y: j * (rowHeight + rowGap) + marginTop,
+            x: x + config.marginLeft,
+            y: y + config.marginTop,
           },
-          width: columnWidth,
-          height: rowHeight,
-          empty: true,
+          width: config.columnsWidth[i],
+          height: config.rowsHeight[j],
+          isEmpty: true,
         });
+
+        x += config.columnsWidth[i] + config.columnGap;
       }
+      y += config.rowsHeight[j] + config.rowGap;
     }
-    //console.log(cells)
-
-    const output = {
-      x: x,
-      y: y,
-      width: width,
-      height: height,
-      row: row,
-      column: column,
-      marginTop: marginTop,
-      marginLeft: marginLeft,
-      marginBottom: marginBottom,
-      marginRight: marginRight,
-      rowGap: rowGap,
-      rowHeight: rowHeight,
-      columnGap: columnGap,
-      columnWidth: columnWidth,
-      cells: cells,
-    };
-
-    config = output;
-    return output;
+    return cells;
   }
 
   function display() {
+    push();
     noFill();
 
     stroke('#3FBCE7');
@@ -117,13 +164,14 @@ const grid = (function () {
       config.height - config.marginTop - config.marginBottom
     );
     pop();
+    pop();
     return config;
   }
 
   function displayCells() {
-    config.cells.map((cell) =>
-      rect(cell.position.x, cell.position.y, config.columnWidth, config.rowHeight)
-    );
+    config.cells.map((el) => {
+      rect(el.position.x, el.position.y, el.width, el.height);
+    });
   }
 
   function getCell(x, y) {
@@ -146,7 +194,7 @@ const grid = (function () {
     display: display,
     displayCells: displayCells,
     getCell: getCell,
-    define: define,
+    create: create,
     select: select,
   };
 })();
