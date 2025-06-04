@@ -74,32 +74,6 @@ npm start
 
 ---
 
-Voici la version mise à jour du **README.md**, avec les ajouts demandés 👇
-
----
-
-## ⚙️ Installation
-
-```bash
-git clone https://github.com/ton-user/ton-repo.git
-cd ton-repo
-yarn install
-```
-
----
-
-## 🔍 Lancement rapide
-
-Je me sers de **[light-server](https://www.npmjs.com/package/light-server)** pour servir les projets localement :
-
-```bash
-npm start
-```
-
-> Par défaut, le serveur pointe vers un projet dans `/projects/`. Tu peux modifier `tools/bs-config.json` pour changer la cible.
-
----
-
 ## 🛠️ Créer un nouveau projet
 
 Pour créer un nouveau projet avec la structure de base :
