@@ -1,10 +1,11 @@
 {
   "server": {
-    "baseDir": ["./", "./projects"],
+    "baseDir": "./",
     "port": 3000,
     "host": "0.0.0.0",
     "routes": {
-      "/projet": "./projects"
+      "/libraries": "./libraries",
+      "/@": "."
     }
   },
   "files": ["./**/*.{html,css,js}"],
