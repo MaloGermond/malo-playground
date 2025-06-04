@@ -10,7 +10,7 @@
   "scripts": {
     "start": "lite-server",
     "format": "prettier --write .",
-    "new": "node scripts/newProject.js"
+    "new": "node scripts/CreateNewProject.js"
   },
   "author": "",
   "license": "ISC",
