@@ -1,131 +1,88 @@
-# Motion Library Documentation
+📘 **README.md — Playground JS de Malo**
 
-The Motion library provides a simple and versatile tool for handling animations with P5JS. It allows you to animate properties of JavaScript objects smoothly over time.
+---
 
-## Development Environment
+# 🎛️ Malo Playground
 
-The Motion library seamlessly integrates with `lite-server` to facilitate hot reloading and efficient image loading during development. This setup ensures immediate reflection of code and image asset changes in the browser, thereby enhancing the development workflow.
+Bienvenue dans mon **espace de jeu personnel**. À l’origine, ce projet était une librairie dédiée au **motion design en JavaScript**. Aujourd’hui, c’est devenu un **playground local modulaire** où je développe librement :
 
-### Setup
+- 🎨 des **expérimentations graphiques et visuelles**
+- 🧰 des **petits outils pour le design**
+- 🧪 des **projets interactifs ou performatifs**
+- 🧩 des **librairies maison** que je découpe et versionne
 
-To get started with `lite-server`, ensure it is installed as a development dependency (`--save-dev`) in your project:
+---
+
+## 🚀 Objectif
+
+Créer un environnement simple et flexible pour :
+
+- développer vite
+- tester des idées en local
+- réutiliser facilement du code
+- rester curieux et créatif
+
+---
+
+## 📁 Organisation
 
 ```bash
-npm install lite-server --save-dev
+/
+├── lib/                  # Librairies internes versionnées
+├── projects/             # Un dossier par projet autonome
+├── scripts/              # Scripts utilitaires (convertisseurs, helpers, etc.)
+├── shared-components/    # (optionnel) éléments réutilisables (UI, logique)
+├── tools/                # Fichiers de config ou scripts de build
+├── README.md
+├── package.json
+└── yarn.lock
 ```
 
-### Usage
+Chaque projet est **autonome** (HTML, JS, CSS) et peut utiliser les libs internes via des imports locaux ou `npm link`.
 
-#### Starting the Development Server
+---
 
-To launch the development server, navigate to your project directory and run:
+## ⚙️ Installation
+
+```bash
+git clone https://github.com/ton-user/ton-repo.git
+cd ton-repo
+npm install
+```
+
+---
+
+## 🔍 Lancement rapide
+
+Je me sers de **[light-server](https://www.npmjs.com/package/light-server)** pour servir les projets localement :
 
 ```bash
 npm start
 ```
 
-This command initiates the server and automatically opens your project in the default web browser.
+> Par défaut, le serveur pointe vers un projet dans `/projects/`. Tu peux modifier `tools/bs-config.json` pour changer la cible.
 
-# How to use the motion library
+---
 
-## Initialization
+## 🧠 Philosophie
 
-```html
-<script src="path/motion.js"></script>
-```
+> _J’expérimente en m’amusant, je découpe en petites briques, je construis pour moi, mais peut-être pour les autres demain._
 
-Initialize the `motion` object, which will be used to handle animations.
+Ce repo n’a pas pour but d’être propre, complet ou finalisé. Il est pensé pour être **manipulé, transformé, cassé et reconstruit**.
 
-## Adding Animations
+---
 
-```javascript
-motion.to(obj, values, duration, option);
-```
+## ✨ À venir
 
-- **obj (Object):** The JavaScript object subject to animation.
-- **values (Object):** Attributes and their target values. `{ a: value, b: value, ... }`.
-- **duration (Int):** Duration of the animation in milliseconds.
-- **option (Object):** Animation settings (e.g., ease, callback).
+- Une structure plus formelle pour publier certaines libs
+- Une interface visuelle pour naviguer dans les projets
 
-## Animation Settings
+---
 
-- **ease (Function):** Easing function for smooth transitions (optional).
-- **callback (Function):** Callback function to execute after the animation completes (optional).
-- **strenght (Number):** Strength factor for the easing function (optional).
-- **amplitude (Number):** Amplitude factor for the easing function (optional).
-- **delay (Int):** Delay before starting the animation (optional).
+## 📄 Licence
 
-## Playing Animations
+Projet personnel. Pas encore de licence définie. Tout est ouvert à discussion.
 
-```javascript
-function draw() {
-  motion.play();
-}
-```
+---
 
-This function updates the animated properties based on the current frame.
-
-# Example
-
-```javascript
-// Adding an animation
-motion.to(myObject, { x: 100, y: 200 }, 1000, { ease: easeInOut, callback: onAnimationComplete });
-
-// Playing animations in the main loop
-function draw() {
-  motion.play();
-  // Additional drawing logic
-  requestAnimationFrame(draw);
-}
-```
-
-# Utility Functions
-
-## Debugging
-
-```javascript
-motion.debug();
-```
-
-Returns an array of animated items for debugging purposes.
-
-## Hex to HSL Conversion
-
-```javascript
-hexToHsl(string);
-```
-
-Converts a hexadecimal color value to HSL (Hue, Saturation, Lightness) format.
-
-## HSL to Hex Conversion
-
-```javascript
-hslToHex(h, s, l);
-```
-
-Converts HSL values to a hexadecimal color value.
-
-# Note
-
-- The library internally uses the `frameCount` and `getTargetFrameRate` functions for precise time calculations.
-
-- The easing functions used are customizable through the `ease` option.
-
-- The library supports both numeric and color animations.
-
-# Example Implementation
-
-```javascript
-import motion from './motion.js';
-
-// Example usage of the motion library
-motion.to(myObject, { x: 100, y: 200 }, 1000, { ease: easeInOut, callback: onAnimationComplete });
-
-function draw() {
-  motion.play();
-  // Additional drawing logic
-  requestAnimationFrame(draw);
-}
-```
-
-Feel free to customize the library and adjust parameters to suit your specific animation needs.
+Tu veux que je t’aide à rédiger la section pour un onboarding rapide (création d’un nouveau projet, comment utiliser une lib interne, etc.) ?
