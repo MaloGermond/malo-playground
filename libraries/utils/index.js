@@ -23,14 +23,10 @@ export function hexToHsl(hex) {
   // Remove the hash if present
   const color = match[1];
 
-  console.log({ color });
-
   let r,
     g,
     b,
     a = 1;
-
-  console.log(color.length);
 
   if (color.length === 3) {
     // Ex: 'abc' → 'aabbcc'
@@ -148,4 +144,14 @@ export function lerpHex(from, to, index) {
   const a = map(index, 0, 1, start.a, end.a);
 
   return hslToHex(h, s, l, a);
+}
+
+// Retourne un hexadecimal
+
+export function randomHex() {
+  // Generate a random number between 0 and 16777215 (decimal equivalent of FFFFFF in hexadecimal)
+  const randomColor = Math.floor(Math.random() * 16777216).toString(16);
+
+  // Pad the color with zeros if needed
+  return `#${randomColor.padStart(6, '0')}`;
 }

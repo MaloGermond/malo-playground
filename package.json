@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "fs-extra": "^11.3.0",
-    "lil-gui": "^0.20.0"
+    "lil-gui": "^0.20.0",
+    "popmotion": "^11.0.5"
   },
   "engines": {
     "node": ">=23.0.0",
