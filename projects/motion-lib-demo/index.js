@@ -1,10 +1,7 @@
-import { hexToHsl } from '/libraries/utils/index.js';
-console.log('script has been load');
+import { hexToHsl, hslToHex, lerpHex } from '/libraries/utils/index.js';
 
 window.setup = function () {
   createCanvas(windowWidth, windowHeight);
-  console.log('P5js has been load');
-  console.log(hexToHsl('#123456'));
 };
 
 window.draw = function () {
