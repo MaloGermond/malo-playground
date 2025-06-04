@@ -8,8 +8,8 @@ if (args.length === 0) {
 }
 
 const projectName = args[0];
-const sourceDir = path.join(process.cwd(), 'exemples', 'starter');
-const targetDir = path.join(process.cwd(), 'exemples', projectName);
+const sourceDir = path.join(process.cwd(), 'scripts', 'starter');
+const targetDir = path.join(process.cwd(), 'projects', projectName);
 
 async function createProject() {
   if (fs.existsSync(targetDir)) {
