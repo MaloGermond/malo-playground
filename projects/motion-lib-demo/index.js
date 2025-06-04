@@ -1,5 +1,6 @@
 import { randomHex } from '/libraries/utils/index.js';
 import { animate } from 'https://cdn.skypack.dev/popmotion';
+
 window.setup = function () {
   createCanvas(windowWidth, windowHeight);
 };
