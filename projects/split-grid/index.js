@@ -1,4 +1,4 @@
-import { animate } from 'https://cdn.skypack.dev/popmotion';
+import { animate, easeInOut } from 'https://cdn.skypack.dev/popmotion';
 import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm';
 import { grid } from '/libraries/grid/index.js';
 
@@ -35,6 +35,8 @@ function animSetting(el, to) {
   animate({
     from: g.config[el],
     to: to,
+    duration: 300,
+    ease: easeInOut,
     onUpdate: (latest) => {
       g.setConfig({ [el]: latest });
     },
@@ -60,13 +62,13 @@ function loadGUI() {
     .add(settings, 'width', 1, 1000, 1)
     .name('Width')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('width', value);
     });
   gui
     .add(settings, 'height', 1, 1000, 1)
     .name('Height')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('height', value);
     });
   gui.add(guiActions, 'addColumn').name('New Column');
   gui.add(guiActions, 'addRow').name('New Row');

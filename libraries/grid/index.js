@@ -99,7 +99,11 @@ export const grid = function (settings) {
 		computeGrid();
 
 		// Background color
-		fill('#fff');
+		push();
+		fill('#ffffff');
+		noStroke();
+		rect(0, 0, config.width, config.height);
+		pop();
 
 		// Display cells
 		push();
