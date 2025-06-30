@@ -6,7 +6,7 @@ const settings = {
   width: 700,
   height: 500,
   columns: ['fr', 'fr', 100, 'fr', 22.4, '10%', 'fr'],
-  rows: ['5%', 'fr', 50, 'fr', '5%'],
+  rows: ['5%', 'fr', 50, 'fr', '8%'],
   rowGap: 3,
   columnGap: 5,
   marginTop: 10,
@@ -20,6 +20,7 @@ const g = grid(settings);
 window.setup = function () {
   createCanvas(windowWidth, windowHeight);
   loadGUI();
+  g.computeGrid();
   g.setConfig(settings);
   console.log(g);
 };

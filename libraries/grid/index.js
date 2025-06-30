@@ -21,6 +21,7 @@
 // [] split(x,y,vertical/horizontal) split la colonne ou la ligne. Ca revient pour un split à 30% à faire rows: ['fr'] -> ['30%','70%']
 // [] resize(col/row, newSize) resize la taille d'une colonne ou d'une ligne.
 // [] pouvoir definir les marges et padding de la "page" et de chaque colonne / ligne individuellement. Genre il y a une régle generale qui peut-être surcharger par une regle locale.
+// [] permettre d'animer la grille avec POP motion. Il vaut mieux que ce soit la lib qui s'occupe de l'animation pour que ca reste performant. Ca évite de bouriner setConfig et tout recalculer. Ensuite est-ce que l'on peut faire ca sans tout recalculer ?...
 
 export const grid = function (settings) {
 	let config = {
@@ -37,9 +38,7 @@ export const grid = function (settings) {
 		rowGap: 4,
 		columnGap: 4,
 		rows: ['fr', 'fr'],
-		rowsHeight: [],
 		columns: ['fr', 'fr', 'fr'],
-		columnsWidth: [],
 		cells: [],
 		...settings,
 	};
@@ -63,7 +62,37 @@ export const grid = function (settings) {
 	}
 
 	function computeCells() {
-		return [];
+		const cells = new Array();
+
+		let x = 0;
+		let y = 0;
+
+		// C'est ici que l'on fait le calcule de la taille des cells.
+		// Comment on calcule l'espace restant
+		// il y a fr, %, px
+		const columns = computeSizes(config.innerWidth, config.columns, config.columnGap);
+		const rows = computeSizes(config.innerHeight, config.rows, config.rowGap);
+
+		for (let j = 0; j < config.rows.length; j++) {
+			x = 0;
+			for (let i = 0; i < config.columns.length; i++) {
+				cells.push({
+					index: i + j * config.columns.length,
+					column: i,
+					row: j,
+					position: {
+						x: x,
+						y: y,
+					},
+					width: columns.cellsLength[i],
+					height: rows.cellsLength[j],
+					isEmpty: true,
+				});
+				x += columns.cellsLength[i] + config.columnGap;
+			}
+			y += rows.cellsLength[j] + config.rowGap;
+		}
+		return cells;
 	}
 
 	function display() {
@@ -85,29 +114,62 @@ export const grid = function (settings) {
 		stroke('#2DC9FF');
 		rect(0, 0, config.innerWidth, config.innerHeight);
 		pop();
+
+		// Display cells
+		push();
+		config.cells.map((el) => {
+			rect(el.position.x, el.position.y, el.width, el.height);
+		});
+		pop();
 	}
 
 	return {
 		setConfig,
+		computeGrid,
 		config,
 		display,
 	};
 };
 
-// Fonction combinée pour calculer taille restante + fraction
-export function computeSizes(totalSize, tracks, gap) {
-	const gapTotal = gap * (tracks.length - 1);
-	const sizeRemaining = totalSize - gapTotal;
+// Fonction combinée pour calculer la taille des cellules
+// Pour ca on doit calculer la tailel des fractions/frac/fr
+export function computeSizes(areaLength, track, gap) {
+	const gapTotal = gap * (track.length - 1);
+	const length = areaLength - gapTotal;
 
-	// Calcul des unités fractionnelles
-	const totalFr = tracks.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
-	const fixedSize = tracks.reduce((acc, cur) => acc + (typeof cur === 'number' ? cur : 0), 0);
+	// Nombre d'éléments en fractionnelle
+	const totalFrac = track.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
 
-	// Taille pour 1fr
-	const sizeForFr = totalFr > 0 ? (sizeRemaining - fixedSize) / totalFr : 0;
+	// Taille occupé par des éléments en pixel
+	const fixedSize = track.reduce((acc, cur) => acc + (typeof cur === 'number' ? cur : 0), 0);
+
+	// Espace restance pour le calule des poucentages
+	// On prend le nombre d'élément en pourcentage que l'on multiplie par la longeur de l'espace
+	const pourcentageLength = track.reduce(
+		(acc, val) =>
+			acc + (typeof val === 'string' && val.includes('%') ? (parseFloat(val) / 100) * length : 0),
+		0
+	);
+
+	// Taille pour une fraction/frac/fr
+	// On prend l'espace restant après le calcule des fixes et des pourcentages pour le diviser en fraction
+	const fracLength = totalFrac > 0 ? (length - (fixedSize + pourcentageLength)) / totalFrac : 0;
+
+	// Calcule en absolue de la taille des celules
+	const cellsLength = track.map((cell) => {
+		if (cell === 'fr') {
+			return fracLength;
+		}
+		if (typeof cell === 'string' && cell.includes('%')) {
+			const pourcentage = parseFloat(cell) / 100;
+			return length * pourcentage;
+		}
+		return cell;
+	});
 
 	return {
-		sizeRemaining,
-		sizeForFr,
+		length,
+		fracLength,
+		cellsLength,
 	};
 }
