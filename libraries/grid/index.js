@@ -81,8 +81,8 @@ export const grid = function (settings) {
 					column: i,
 					row: j,
 					position: {
-						x: x,
-						y: y,
+						x: x + config.marginLeft,
+						y: y + config.marginTop,
 					},
 					width: columns.cellsLength[i],
 					height: rows.cellsLength[j],
@@ -99,27 +99,28 @@ export const grid = function (settings) {
 		computeGrid();
 
 		// Background color
-		fill('#ECEDEE');
-
-		// Display Page area
-		push();
-		stroke('#3FBCE7');
-		rect(0, 0, config.width, config.height);
-		pop();
-
-		// Display innerArea
-		translate(config.marginLeft, config.marginTop);
-		push();
 		fill('#fff');
-		stroke('#2DC9FF');
-		rect(0, 0, config.innerWidth, config.innerHeight);
-		pop();
 
 		// Display cells
 		push();
 		config.cells.map((el) => {
 			rect(el.position.x, el.position.y, el.width, el.height);
 		});
+		pop();
+
+		// Display Page area
+		push();
+		noFill();
+		stroke('#3FBCE7');
+		rect(0, 0, config.width, config.height);
+		pop();
+
+		// Display innerArea
+		push();
+		translate(config.marginLeft, config.marginTop);
+		noFill();
+		stroke('#2DC9FF');
+		rect(0, 0, config.innerWidth, config.innerHeight);
 		pop();
 	}
 

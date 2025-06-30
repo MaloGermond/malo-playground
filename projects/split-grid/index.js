@@ -1,4 +1,5 @@
 import { animate } from 'https://cdn.skypack.dev/popmotion';
+import GUI from 'https://cdn.jsdelivr.net/npm/lil-gui@0.20/+esm';
 import { grid } from '/libraries/grid/index.js';
 
 const settings = {
@@ -33,16 +34,15 @@ window.draw = function () {
 const guiActions = {
   addColumn: function () {
     settings.columns.push('fr');
-    renderGrid();
+    g.setConfig(settings);
   },
   addRow: function () {
     settings.rows.push('fr');
-    renderGrid();
+    g.setConfig(settings);
   },
 };
 
 function loadGUI() {
-  const GUI = lil.GUI;
   const gui = new GUI();
 
   gui.add(settings, 'displayGrid').name('Show grid');
@@ -82,7 +82,7 @@ function loadGUI() {
     .add(settings, 'marginRight')
     .name('Margin Right')
     .onChange((value) => {
-      g.setConfig(settings);
+      g.settings(settings);
     });
   gui
     .add(settings, 'marginBottom')
