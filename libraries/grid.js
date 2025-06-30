@@ -52,6 +52,7 @@ const grid = (function () {
       config.columns,
       config.columnGap
     );
+
     config.widthFraction = computeFraction(config.widthRemaining, config.columns);
 
     config.heightRemaining = computeSizeRemaining(config.innerHeight, config.rows, config.rowGap);
