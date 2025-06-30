@@ -46,7 +46,7 @@ export const grid = function (settings) {
 	let updateRequired = true;
 
 	function setConfig(newConfig) {
-		config = { ...config, ...newConfig };
+		Object.assign(config, newConfig);
 		updateRequired = true;
 	}
 

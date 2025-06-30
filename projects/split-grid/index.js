@@ -31,6 +31,16 @@ window.draw = function () {
   g.display();
 };
 
+function animSetting(el, to) {
+  animate({
+    from: g.config[el],
+    to: to,
+    onUpdate: (latest) => {
+      g.setConfig({ [el]: latest });
+    },
+  });
+}
+
 const guiActions = {
   addColumn: function () {
     settings.columns.push('fr');
@@ -64,36 +74,36 @@ function loadGUI() {
     .add(settings, 'rowGap', 0, 30, 1)
     .name('Gap Row')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('rowGap', value);
     });
   gui
     .add(settings, 'columnGap', 0, 30, 1)
     .name('Gap Column')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('columnGap', value);
     });
   gui
     .add(settings, 'marginTop')
     .name('Margin Top')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('marginTop', value);
     });
   gui
     .add(settings, 'marginRight')
     .name('Margin Right')
     .onChange((value) => {
-      g.settings(settings);
+      animSetting('marginRight', value);
     });
   gui
     .add(settings, 'marginBottom')
     .name('Margin Bottom')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('marginBottom', value);
     });
   gui
     .add(settings, 'marginLeft')
     .name('Margin Left')
     .onChange((value) => {
-      g.setConfig(settings);
+      animSetting('marginLeft', value);
     });
 }
