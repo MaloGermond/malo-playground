@@ -8,9 +8,6 @@
 
 // TO DO
 //
-// [] pourvoir créer une grille avec margin/padding
-// [] la grille doit pouvoir avec des colonnes et des lignes de taille (width/height) variable
-// [] les col/lignes doivent pouvoir avec un margin propre à elle
 // [] on doit pouvoir spliter une colonne ou un ligne
 // [] on doit pouvoir "resize" "deplacer" la valeur d'une ligne/colonne
 // [] on doit pouvoir placer des éléments de taille variable dans la grille (de n col et n row)
@@ -70,29 +67,49 @@ export const grid = function (settings) {
 		// C'est ici que l'on fait le calcule de la taille des cells.
 		// Comment on calcule l'espace restant
 		// il y a fr, %, px
-		const columns = computeSizes(config.innerWidth, config.columns, config.columnGap);
-		const rows = computeSizes(config.innerHeight, config.rows, config.rowGap);
+		config.columnsSizes = computeSizes(config.innerWidth, config.columns, config.columnGap);
+		config.rowsSizes = computeSizes(config.innerHeight, config.rows, config.rowGap);
+		const columns = config.columnsSizes;
+		const rows = config.rowsSizes;
 
 		for (let j = 0; j < config.rows.length; j++) {
 			x = 0;
 			for (let i = 0; i < config.columns.length; i++) {
-				cells.push({
-					index: i + j * config.columns.length,
-					column: i,
-					row: j,
-					position: {
-						x: x + config.marginLeft,
-						y: y + config.marginTop,
-					},
-					width: columns.cellsLength[i],
-					height: rows.cellsLength[j],
-					isEmpty: true,
-				});
+				// Il faudrait ajouter les gap comme des cells pour que ce soit plus modulable et plus simple à selectionner.
+				cells.push(
+					createCell(i, j, config.columns.length, x, y, columns.cellsLength[i], rows.cellsLength[j])
+				);
+
 				x += columns.cellsLength[i] + config.columnGap;
 			}
 			y += rows.cellsLength[j] + config.rowGap;
 		}
 		return cells;
+	}
+
+	function createCell(i, j, columnsLength, x, y, width, height, type = 'cell') {
+		return {
+			index: i + j * columnsLength,
+			column: i,
+			row: j,
+			position: {
+				x: x,
+				y: y,
+			},
+			width: width,
+			height: height,
+			isEmpty: true,
+			type: type,
+		};
+	}
+
+	// Retourne la cell qui est positionner en x,y a partir de l'origine de la grille
+	function getCell(x, y) {
+		// Position x, y relative au coin haut gauche de la grille
+		const relX = x - config.marginLeft;
+		const relY = y - config.marginTop;
+
+		return { relX, relY };
 	}
 
 	function display() {
@@ -133,6 +150,7 @@ export const grid = function (settings) {
 		computeGrid,
 		config,
 		display,
+		getCell,
 	};
 };
 
@@ -172,9 +190,16 @@ export function computeSizes(areaLength, track, gap) {
 		return cell;
 	});
 
+	const cumulativeLength = cellsLength.reduce((acc, value, index) => {
+		const previous = index === 0 ? 0 : acc[index - 1];
+		acc.push(previous + value);
+		return acc;
+	}, []);
+
 	return {
 		length,
 		fracLength,
 		cellsLength,
+		cumulativeLength,
 	};
 }

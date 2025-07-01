@@ -29,6 +29,7 @@ window.setup = function () {
 window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
   g.display();
+  // console.log(g.getCell(mouseX, mouseY));
 };
 
 function animSetting(el, to) {
