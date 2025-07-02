@@ -28,15 +28,13 @@ export const grid = function (settings) {
 		height: 200,
 		innerWidth: undefined,
 		innerHeight: undefined,
-		marginTop: 20,
-		marginLeft: 20,
-		marginBottom: 20,
-		marginRight: 20,
+		margin: { top: 20, right: 20, bottom: 20, left: 20 },
 		rowGap: 4,
 		columnGap: 4,
 		rows: ['fr', 'fr'],
 		columns: ['fr', 'fr', 'fr'],
 		cells: [],
+		layout: { columns: {}, rows: {} },
 		...settings,
 	};
 
@@ -50,8 +48,8 @@ export const grid = function (settings) {
 	function computeGrid() {
 		if (!updateRequired) return;
 
-		config.innerWidth = config.width - config.marginLeft - config.marginRight;
-		config.innerHeight = config.height - config.marginTop - config.marginBottom;
+		config.innerWidth = config.width - config.margin.left - config.margin.right;
+		config.innerHeight = config.height - config.margin.top - config.margin.bottom;
 
 		config.cells = computeCells();
 
@@ -67,47 +65,56 @@ export const grid = function (settings) {
 		// C'est ici que l'on fait le calcule de la taille des cells.
 		// Comment on calcule l'espace restant
 		// il y a fr, %, px
-		config.columnsSizes = computeSizes(config.innerWidth, config.columns, config.columnGap);
-		config.rowsSizes = computeSizes(config.innerHeight, config.rows, config.rowGap);
-		const columns = config.columnsSizes;
-		const rows = config.rowsSizes;
+		// C'est pas mal car si je veux optimiser j'ai juste à refaire le calcule que pour les rows ou columns et faire un render (le calcule des cells en dessous)
+		config.layout.columns = computeSizes(config.innerWidth, config.columns, config.columnGap);
+		config.layout.rows = computeSizes(config.innerHeight, config.rows, config.rowGap);
+		const columns = config.layout.columns;
+		const rows = config.layout.rows;
+		console.log(config);
+		// Ici j'ai toutes les tailles, donc si je n'ai plus besoin du x et y je peux le retrouve avec config.columns
 
-		for (let j = 0; j < config.rows.length; j++) {
-			x = 0;
-			for (let i = 0; i < config.columns.length; i++) {
+		for (let j = 0; j < rows.cumulativeOffsets.length; j++) {
+			for (let i = 0; i < columns.cumulativeOffsets.length; i++) {
 				// Il faudrait ajouter les gap comme des cells pour que ce soit plus modulable et plus simple à selectionner.
 				cells.push(
-					createCell(i, j, config.columns.length, x, y, columns.cellsLength[i], rows.cellsLength[j])
+					createCell({
+						i: i,
+						j: j,
+						layout: config.layout,
+					})
 				);
-
-				x += columns.cellsLength[i] + config.columnGap;
 			}
-			y += rows.cellsLength[j] + config.rowGap;
 		}
 		return cells;
 	}
 
-	function createCell(i, j, columnsLength, x, y, width, height, type = 'cell') {
+	function createCell({
+		i,
+		j,
+		layout = config.layout,
+		margin = config.margin,
+		type = 'cell',
+		isEmpty = true,
+	}) {
+		const x = layout.columns.cumulativeOffsets[i] + margin.left;
+		const y = layout.rows.cumulativeOffsets[j] + margin.top;
 		return {
-			index: i + j * columnsLength,
+			index: i + j * layout.columns.segmentSizes.length,
 			column: i,
 			row: j,
-			position: {
-				x: x,
-				y: y,
-			},
-			width: width,
-			height: height,
-			isEmpty: true,
-			type: type,
+			position: { x, y },
+			width: layout.columns.segmentSizes[i],
+			height: layout.rows.segmentSizes[j],
+			isEmpty,
+			type,
 		};
 	}
 
 	// Retourne la cell qui est positionner en x,y a partir de l'origine de la grille
 	function getCell(x, y) {
 		// Position x, y relative au coin haut gauche de la grille
-		const relX = x - config.marginLeft;
-		const relY = y - config.marginTop;
+		const relX = x - config.margin.left;
+		const relY = y - config.margin.top;
 
 		return { relX, relY };
 	}
@@ -125,6 +132,7 @@ export const grid = function (settings) {
 		// Display cells
 		push();
 		config.cells.map((el) => {
+			noFill();
 			rect(el.position.x, el.position.y, el.width, el.height);
 		});
 		pop();
@@ -138,7 +146,7 @@ export const grid = function (settings) {
 
 		// Display innerArea
 		push();
-		translate(config.marginLeft, config.marginTop);
+		translate(config.margin.left, config.margin.top);
 		noFill();
 		stroke('#2DC9FF');
 		rect(0, 0, config.innerWidth, config.innerHeight);
@@ -156,50 +164,63 @@ export const grid = function (settings) {
 
 // Fonction combinée pour calculer la taille des cellules
 // Pour ca on doit calculer la tailel des fractions/frac/fr
-export function computeSizes(areaLength, track, gap) {
-	const gapTotal = gap * (track.length - 1);
-	const length = areaLength - gapTotal;
+export function computeSizes(containerSize, segments, gutter) {
+	const totalGutterSize = gutter * (segments.length - 1);
+	const totalSegmentsSize = containerSize - totalGutterSize;
 
 	// Nombre d'éléments en fractionnelle
-	const totalFrac = track.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
+	const fracCount = segments.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
 
 	// Taille occupé par des éléments en pixel
-	const fixedSize = track.reduce((acc, cur) => acc + (typeof cur === 'number' ? cur : 0), 0);
+	const fixedSize = segments.reduce((acc, cur) => acc + (typeof cur === 'number' ? cur : 0), 0);
 
 	// Espace restance pour le calule des poucentages
 	// On prend le nombre d'élément en pourcentage que l'on multiplie par la longeur de l'espace
-	const pourcentageLength = track.reduce(
+	const pourcentageLength = segments.reduce(
 		(acc, val) =>
-			acc + (typeof val === 'string' && val.includes('%') ? (parseFloat(val) / 100) * length : 0),
+			acc +
+			(typeof val === 'string' && val.includes('%')
+				? (parseFloat(val) / 100) * totalSegmentsSize
+				: 0),
 		0
 	);
 
 	// Taille pour une fraction/frac/fr
 	// On prend l'espace restant après le calcule des fixes et des pourcentages pour le diviser en fraction
-	const fracLength = totalFrac > 0 ? (length - (fixedSize + pourcentageLength)) / totalFrac : 0;
+	const fracSize =
+		fracCount > 0 ? (totalSegmentsSize - (fixedSize + pourcentageLength)) / fracCount : 0;
 
 	// Calcule en absolue de la taille des celules
-	const cellsLength = track.map((cell) => {
+	const convertedSegmentSizes = segments.map((cell) => {
 		if (cell === 'fr') {
-			return fracLength;
+			return fracSize;
 		}
 		if (typeof cell === 'string' && cell.includes('%')) {
 			const pourcentage = parseFloat(cell) / 100;
-			return length * pourcentage;
+			return totalSegmentsSize * pourcentage;
 		}
 		return cell;
 	});
 
-	const cumulativeLength = cellsLength.reduce((acc, value, index) => {
-		const previous = index === 0 ? 0 : acc[index - 1];
-		acc.push(previous + value);
+	const segmentSizes = convertedSegmentSizes.flatMap((size, index) =>
+		index < convertedSegmentSizes.length - 1 ? [size, gutter] : [size]
+	);
+	const cumulativeOffsets = segmentSizes.reduce((acc, value, index) => {
+		if (index === 0) {
+			acc.push(0);
+			acc.push(value);
+			return acc;
+		}
+		acc.push(acc[index] + value);
 		return acc;
 	}, []);
 
 	return {
-		length,
-		fracLength,
-		cellsLength,
-		cumulativeLength,
+		totalSegmentsSize,
+		totalGutterSize,
+		fracSize,
+		convertedSegmentSizes,
+		segmentSizes,
+		cumulativeOffsets,
 	};
 }

@@ -10,10 +10,7 @@ const settings = {
   rows: ['5%', 'fr', 50, 'fr', '8%'],
   rowGap: 3,
   columnGap: 5,
-  marginTop: 10,
-  marginLeft: 10,
-  marginRight: 10,
-  marginBottom: 10,
+  margin: { top: 10, right: 10, bottom: 10, left: 10 },
 };
 
 const g = grid(settings);
@@ -34,7 +31,7 @@ window.draw = function () {
 
 function animSetting(el, to) {
   animate({
-    from: g.config[el],
+    from: getNestedValue(g.config, el),
     to: to,
     duration: 300,
     ease: easeInOut,
@@ -42,6 +39,12 @@ function animSetting(el, to) {
       g.setConfig({ [el]: latest });
     },
   });
+}
+
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((acc, key) => {
+    return acc ? acc[key] : undefined;
+  }, obj);
 }
 
 const guiActions = {
@@ -86,27 +89,27 @@ function loadGUI() {
       animSetting('columnGap', value);
     });
   gui
-    .add(settings, 'marginTop')
+    .add(settings.margin, 'top')
     .name('Margin Top')
     .onChange((value) => {
-      animSetting('marginTop', value);
+      animSetting('margin.top', value);
     });
   gui
-    .add(settings, 'marginRight')
+    .add(settings.margin, 'right')
     .name('Margin Right')
     .onChange((value) => {
-      animSetting('marginRight', value);
+      animSetting('margin.right', value);
     });
   gui
-    .add(settings, 'marginBottom')
+    .add(settings.margin, 'bottom')
     .name('Margin Bottom')
     .onChange((value) => {
-      animSetting('marginBottom', value);
+      animSetting('margin.bottom', value);
     });
   gui
-    .add(settings, 'marginLeft')
+    .add(settings.margin, 'left')
     .name('Margin Left')
     .onChange((value) => {
-      animSetting('marginLeft', value);
+      animSetting('margin.left', value);
     });
 }
