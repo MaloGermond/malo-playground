@@ -68,13 +68,13 @@ export const grid = function (settings) {
 		// C'est pas mal car si je veux optimiser j'ai juste à refaire le calcule que pour les rows ou columns et faire un render (le calcule des cells en dessous)
 		config.layout.columns = computeSizes(config.innerWidth, config.columns, config.columnGap);
 		config.layout.rows = computeSizes(config.innerHeight, config.rows, config.rowGap);
-		const columns = config.layout.columns;
-		const rows = config.layout.rows;
+		const columns = config.layout.columns.spans;
+		const rows = config.layout.rows.spans;
 		console.log(config);
 		// Ici j'ai toutes les tailles, donc si je n'ai plus besoin du x et y je peux le retrouve avec config.columns
 
-		for (let j = 0; j < rows.cumulativeOffsets.length; j++) {
-			for (let i = 0; i < columns.cumulativeOffsets.length; i++) {
+		for (let j = 0; j < rows.length; j++) {
+			for (let i = 0; i < columns.length; i++) {
 				// Il faudrait ajouter les gap comme des cells pour que ce soit plus modulable et plus simple à selectionner.
 				cells.push(
 					createCell({
@@ -88,16 +88,16 @@ export const grid = function (settings) {
 		return cells;
 	}
 
-	function createCell({
-		i,
-		j,
-		layout = config.layout,
-		margin = config.margin,
-		type = 'cell',
-		isEmpty = true,
-	}) {
-		const x = layout.columns.cumulativeOffsets[i] + margin.left;
-		const y = layout.rows.cumulativeOffsets[j] + margin.top;
+	function createCell({ i, j, layout = config.layout, margin = config.margin, isEmpty = true }) {
+		const x = layout.columns.spans[i].offset + margin.left;
+		const y = layout.rows.spans[j].offset + margin.top;
+		const type =
+			layout.rows.spans[j].type === 'gutter' || layout.columns.spans[i].type === 'gutter'
+				? 'gutter'
+				: 'cell';
+		// console.log(layout.rows.spans[j].type);
+		// console.log(layout.columns.spans[j].type);
+		// console.log({ type });
 		return {
 			index: i + j * layout.columns.segmentSizes.length,
 			column: i,
@@ -106,7 +106,7 @@ export const grid = function (settings) {
 			width: layout.columns.segmentSizes[i],
 			height: layout.rows.segmentSizes[j],
 			isEmpty,
-			type,
+			type: type,
 		};
 	}
 
@@ -133,6 +133,11 @@ export const grid = function (settings) {
 		push();
 		config.cells.map((el) => {
 			noFill();
+			stroke('#2DC9FF');
+			if (el.type === 'gutter') {
+				noStroke();
+				fill('#ECEDEE');
+			}
 			rect(el.position.x, el.position.y, el.width, el.height);
 		});
 		pop();
@@ -165,9 +170,11 @@ export const grid = function (settings) {
 // Fonction combinée pour calculer la taille des cellules
 // Pour ca on doit calculer la tailel des fractions/frac/fr
 export function computeSizes(containerSize, segments, gutter) {
+	// Compte le nombre de gouttier et calcule la taille d'espace disponible
 	const totalGutterSize = gutter * (segments.length - 1);
 	const totalSegmentsSize = containerSize - totalGutterSize;
 
+	// 1. Compte les fr et tailles fixes
 	// Nombre d'éléments en fractionnelle
 	const fracCount = segments.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
 
@@ -176,7 +183,7 @@ export function computeSizes(containerSize, segments, gutter) {
 
 	// Espace restance pour le calule des poucentages
 	// On prend le nombre d'élément en pourcentage que l'on multiplie par la longeur de l'espace
-	const pourcentageLength = segments.reduce(
+	const percentageSize = segments.reduce(
 		(acc, val) =>
 			acc +
 			(typeof val === 'string' && val.includes('%')
@@ -185,11 +192,12 @@ export function computeSizes(containerSize, segments, gutter) {
 		0
 	);
 
-	// Taille pour une fraction/frac/fr
+	// 2. Calcule la taille d'un "fr"
 	// On prend l'espace restant après le calcule des fixes et des pourcentages pour le diviser en fraction
 	const fracSize =
-		fracCount > 0 ? (totalSegmentsSize - (fixedSize + pourcentageLength)) / fracCount : 0;
+		fracCount > 0 ? (totalSegmentsSize - (fixedSize + percentageSize)) / fracCount : 0;
 
+	// 3. Convertit les segments en tailles absolues
 	// Calcule en absolue de la taille des celules
 	const convertedSegmentSizes = segments.map((cell) => {
 		if (cell === 'fr') {
@@ -202,20 +210,36 @@ export function computeSizes(containerSize, segments, gutter) {
 		return cell;
 	});
 
-	const segmentSizes = convertedSegmentSizes.flatMap((size, index) =>
-		index < convertedSegmentSizes.length - 1 ? [size, gutter] : [size]
-	);
-	const cumulativeOffsets = segmentSizes.reduce((acc, value, index) => {
-		if (index === 0) {
-			acc.push(0);
-			acc.push(value);
-			return acc;
+	// 4. Construit les spans (segment + gutter) avec offsets progressifs
+	const spans = [];
+	let offset = 0;
+
+	convertedSegmentSizes.forEach((size, index) => {
+		// Segment
+		spans.push({
+			type: 'segment',
+			size,
+			offset,
+		});
+		offset += size;
+
+		// Gutter (sauf après le dernier)
+		if (index < convertedSegmentSizes.length - 1) {
+			spans.push({
+				type: 'gutter',
+				size: gutter,
+				offset,
+			});
+			offset += gutter;
 		}
-		acc.push(acc[index] + value);
-		return acc;
-	}, []);
+	});
+
+	// 5. segmentSizes + offsets à plat pour usage plus bas niveau
+	const segmentSizes = spans.map((s) => s.size);
+	const cumulativeOffsets = spans.map((s) => s.offset);
 
 	return {
+		spans,
 		totalSegmentsSize,
 		totalGutterSize,
 		fracSize,
