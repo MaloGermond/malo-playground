@@ -81,6 +81,7 @@ export const grid = function (settings) {
 						i: i,
 						j: j,
 						layout: config.layout,
+						type: rows[j].type === 'gutter' || columns[i].type === 'gutter' ? 'gutter' : 'cell',
 					})
 				);
 			}
@@ -88,16 +89,19 @@ export const grid = function (settings) {
 		return cells;
 	}
 
-	function createCell({ i, j, layout = config.layout, margin = config.margin, isEmpty = true }) {
+	function createCell({
+		i,
+		j,
+		layout = config.layout,
+		margin = config.margin,
+		isEmpty = true,
+		type = 'cell',
+	}) {
 		const x = layout.columns.spans[i].offset + margin.left;
 		const y = layout.rows.spans[j].offset + margin.top;
-		const type =
-			layout.rows.spans[j].type === 'gutter' || layout.columns.spans[i].type === 'gutter'
-				? 'gutter'
-				: 'cell';
 
 		return {
-			index: i + j * layout.columns.segmentSizes.length,
+			index: getCellIndex(i, j, layout.columns.totalSegments),
 			column: i,
 			row: j,
 			position: { x, y },
@@ -114,21 +118,33 @@ export const grid = function (settings) {
 		const relX = x - config.margin.left;
 		const relY = y - config.margin.top;
 
-		const col = findIntervalIndex(relX, config.layout.columns.cumulativeOffsets);
-		const row = findIntervalIndex(relY, config.layout.rows.cumulativeOffsets);
+		const col = getCellIndexAtPosition(relX, config.layout.columns.spans);
+		const row = getCellIndexAtPosition(relY, config.layout.rows.spans);
 
-		return { row, col };
+		if (col === -1 || row === -1) return;
+
+		const index = getCellIndex(col, row, config.layout.columns.totalSegments);
+
+		return config.cells[index];
 	}
 
-	function findIntervalIndex(value, array) {
-		for (let i = 0; i < array.length - 1; i++) {
-			const min = array[i];
-			const max = array[i + 1];
-			if (value >= min && value < max) {
-				return i;
-			}
-		}
-		return -1; // pas trouvé (en dehors des bornes)
+	function getCellIndex(col, row, columnCount) {
+		return col + row * columnCount;
+	}
+	function getCellCoordinates(index, columnCount) {
+		const col = index % columnCount; // colonne
+		const row = Math.floor(index / columnCount); // ligne
+		return { col, row };
+	}
+
+	function getCellIndexAtPosition(position, spans) {
+		const index = spans.findIndex((span) => {
+			const start = span.offset;
+			const end = span.offset + span.size;
+			return position >= start && position < end;
+		});
+
+		return index; // pas trouvé (en dehors des bornes)
 	}
 
 	function display() {
@@ -185,6 +201,8 @@ export function computeSizes(containerSize, segments, gutter) {
 	// Compte le nombre de gouttier et calcule la taille d'espace disponible
 	const totalGutterSize = gutter * (segments.length - 1);
 	const totalSegmentsSize = containerSize - totalGutterSize;
+
+	const totalSegments = segments.length;
 
 	// 1. Compte les fr et tailles fixes
 	// Nombre d'éléments en fractionnelle
@@ -258,5 +276,6 @@ export function computeSizes(containerSize, segments, gutter) {
 		convertedSegmentSizes,
 		segmentSizes,
 		cumulativeOffsets,
+		totalSegments,
 	};
 }
