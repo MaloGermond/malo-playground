@@ -25,7 +25,18 @@ window.setup = function () {
 
 window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
-  g.display();
+  if (settings.displayGrid) {
+    g.display();
+  }
+  const item = g.getCell(mouseX, mouseY);
+  if (item && item.type === 'cell') {
+    // console.log(item);
+    push();
+    noStroke();
+    fill('#D8DFFF');
+    rect(item.position.x, item.position.y, item.width, item.height);
+    pop();
+  }
 };
 
 window.mousePressed = function () {

@@ -202,8 +202,6 @@ export function computeSizes(containerSize, segments, gutter) {
 	const totalGutterSize = gutter * (segments.length - 1);
 	const totalSegmentsSize = containerSize - totalGutterSize;
 
-	const totalSegments = segments.length;
-
 	// 1. Compte les fr et tailles fixes
 	// Nombre d'éléments en fractionnelle
 	const fracCount = segments.reduce((acc, cur) => acc + (cur === 'fr' ? 1 : 0), 0);
@@ -267,6 +265,7 @@ export function computeSizes(containerSize, segments, gutter) {
 	// 5. segmentSizes + offsets à plat pour usage plus bas niveau
 	const segmentSizes = spans.map((s) => s.size);
 	const cumulativeOffsets = spans.map((s) => s.offset);
+	const totalSegments = segmentSizes.length;
 
 	return {
 		spans,
