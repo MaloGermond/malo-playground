@@ -6,7 +6,7 @@ const settings = {
   displayGrid: true,
   width: 700,
   height: 500,
-  columns: ['fr', 'fr', 100, 'fr', 22.4, '10%', 'fr'],
+  columns: ['fr', 22.4, '20%', 'fr'],
   rows: ['5%', 'fr', 50, 'fr', '8%'],
   rowGap: 3,
   columnGap: 5,
@@ -40,7 +40,14 @@ window.draw = function () {
 };
 
 window.mousePressed = function () {
-  console.log(g.getCell(mouseX, mouseY));
+  const item = g.getCell(mouseX, mouseY);
+  if (item && item.type === 'cell') {
+    console.log(item.column);
+    // OK donc ici j'ai un problème car
+    // g.config.layout.columns.spans[item.column] != g.config.column
+    // Donc si je veux faire des modifications pour la taille des columns je me retrouve entre deux types de definition. Une ou les gutters sont definis et une autre ou non.
+    console.log(g.config.layout.columns.spans[item.column]);
+  }
 };
 
 function animSetting(el, to) {
