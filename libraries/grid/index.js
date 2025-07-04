@@ -70,7 +70,7 @@ export const grid = function (settings) {
 		config.layout.rows = computeSizes(config.innerHeight, config.rows, config.rowGap);
 		const columns = config.layout.columns.spans;
 		const rows = config.layout.rows.spans;
-		console.log(config);
+
 		// Ici j'ai toutes les tailles, donc si je n'ai plus besoin du x et y je peux le retrouve avec config.columns
 
 		for (let j = 0; j < rows.length; j++) {
@@ -95,9 +95,7 @@ export const grid = function (settings) {
 			layout.rows.spans[j].type === 'gutter' || layout.columns.spans[i].type === 'gutter'
 				? 'gutter'
 				: 'cell';
-		// console.log(layout.rows.spans[j].type);
-		// console.log(layout.columns.spans[j].type);
-		// console.log({ type });
+
 		return {
 			index: i + j * layout.columns.segmentSizes.length,
 			column: i,
@@ -116,7 +114,21 @@ export const grid = function (settings) {
 		const relX = x - config.margin.left;
 		const relY = y - config.margin.top;
 
-		return { relX, relY };
+		const col = findIntervalIndex(relX, config.layout.columns.cumulativeOffsets);
+		const row = findIntervalIndex(relY, config.layout.rows.cumulativeOffsets);
+
+		return { row, col };
+	}
+
+	function findIntervalIndex(value, array) {
+		for (let i = 0; i < array.length - 1; i++) {
+			const min = array[i];
+			const max = array[i + 1];
+			if (value >= min && value < max) {
+				return i;
+			}
+		}
+		return -1; // pas trouvé (en dehors des bornes)
 	}
 
 	function display() {

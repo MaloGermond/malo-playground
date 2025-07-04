@@ -1,25 +1,26 @@
 //import motion from "./src/motion.js"
+import { animate, easeInOut } from 'https://cdn.skypack.dev/popmotion';
 
 const test = grid;
 
 let instance = {};
 
-function setup() {
+window.setup = function () {
   createCanvas(windowWidth, windowHeight);
   //frameRate(5)
   //motion.to(instance, { color: "#91E939" }, 3000)
   // console.log(motion.debug())
-  createBoxes(5);
+  // createBoxes(5);
   instance = {
     pos: {
       x: 200,
       y: 200,
     },
     size: {
-      w: 300,
-      h: 400,
+      w: 80,
+      h: 200,
     },
-    depth: 10,
+    depth: 15,
     color: '#0E2431',
     pov: {
       x: random(0, 100),
@@ -27,38 +28,93 @@ function setup() {
     },
   };
   // test.set({ width: windowWidth - 200, height: windowHeight - 200 });
-}
+};
 
-function draw() {
+window.draw = function () {
   background('#F8F9FA');
-  //test.display()
-  boxes.map((el) => drawBox(el.pos, el.size, el.pov, el.scale));
-  // textSize(50)
-  // // textFont("Titillium Web")
-  // textFont("Josefin Sans")
-  // text('- Suis-je devenu fou ?', 100, 100)
-  // textSize(30)
-  // text('Oui je pense Chapelier.\n Mais je vais te dire un secret : la plupart des gens bien le sont.', 300, 200, 400)
-  //drawBox(instance.pos, instance.size, { x: mouseX, y: mouseY }, instance.depth)
+  // boxes.map((el) => drawBox(el.pos, el.size, el.pov, el.scale));
+  drawBox({ pos: instance.pos, size: instance.size, pov: instance.pov, depth: instance.depth });
   motion.play();
-  //console.log(motion.debug())
-}
+  // console.log(motion.debug());
+};
 
-function mousePressed() {
-  //motion.to(instance.pov, { x: random(0, 100), y: random(0, 100) }, 1500, { ease: "spring", strenght: 5, amplitude: 2 })
+window.keyPressed = function () {
+  // motion.to(instance.pov, { x: random(0, 100), y: random(0, 100) }, 1500, {
+  //   ease: 'spring',
+  //   strenght: 5,
+  //   amplitude: 2,
+  // });
+  console.log({ keyCode });
+
+  if (keyCode == 70) {
+    animate({
+      from: instance.pov.x,
+      to: random(0, 100),
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.pov.x = latest;
+      },
+    });
+
+    animate({
+      from: instance.pov.y,
+      to: random(0, 100),
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.pov.y = latest;
+      },
+    });
+  }
+
+  if (keyCode == 83) {
+    animate({
+      from: instance.size.w,
+      to: random(40, 200),
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.size.w = latest;
+      },
+    });
+    animate({
+      from: instance.size.h,
+      to: random(40, 200),
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.size.h = latest;
+      },
+    });
+  }
+
+  if (keyCode == 68) {
+    animate({
+      from: instance.depth,
+      to: random(3, 20),
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.depth = latest;
+      },
+    });
+  }
+
   //console.log(instance.pov)
-  boxes.map((el) =>
-    motion.to(el.pov, { x: random(0, 100), y: random(0, 100) }, 1500, {
-      ease: 'spring',
-      strenght: 5,
-      amplitude: 2,
-      delay: random(0, 1000),
-    })
-  );
-}
+  // boxes.map((el) =>
+  //   motion.to(el.pov, { x: random(0, 100), y: random(0, 100) }, 1500, {
+  //     ease: 'spring',
+  //     strenght: 5,
+  //     amplitude: 2,
+  //     delay: random(0, 1000),
+  //   })
+  // );
+};
 
-function drawBox(pos, size, pov, depth) {
+function drawBox({ pos, size, pov, depth }) {
   push();
+  rectMode(CENTER);
   beginClip();
   rect(pos.x, pos.y, size.w, size.h);
   endClip();
@@ -103,10 +159,16 @@ let boxes = new Array();
 
 function createBoxes(quantity) {
   for (let i = 0; i < quantity; i++) {
-    const posX = random(20, windowWidth);
-    const posY = random(20, windowHeight);
     const width = random(50, 200);
     const height = random(50, 200);
+    const posX = random(20, windowWidth) - width / 2;
+    const posY = random(20, windowHeight) - height / 2;
+
+    // const width = 80;
+    // const height = 200;
+    // const posX = windowWidth / 2 - width / 2;
+    // const posY = windowHeight / 2 - height / 2;
+
     boxes.push({
       pos: {
         x: posX,
