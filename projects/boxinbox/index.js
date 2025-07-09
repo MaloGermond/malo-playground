@@ -8,13 +8,13 @@ let instance = {};
 
 const setting = {
   size: {
-    min: { w: 50, h: 50 },
+    min: { w: 100, h: 100 },
     max: { w: 400, h: 400 },
   },
 };
 
 window.setup = function () {
-  createCanvas(1080 / 2, 1920 / 2);
+  createCanvas(1080 / 2, 1080 / 2);
   //frameRate(5)
   //motion.to(instance, { color: "#91E939" }, 3000)
   // console.log(motion.debug())
@@ -25,15 +25,15 @@ window.setup = function () {
       y: height / 2,
     },
     size: {
-      w: 80,
-      h: 200,
+      w: 300,
+      h: 300,
     },
     depth: 15,
     colorForeground: '#0E2431',
     colorBackground: 'ECEFF2',
     pov: {
-      x: random(0, 100),
-      y: random(0, 100),
+      x: 0,
+      y: 0,
     },
   };
 
@@ -128,7 +128,6 @@ window.keyPressed = function () {
         const cbackground = hslToHex(latest, 0.1, 0.1);
         instance.colorForeground = cForeground;
         instance.colorBackground = cbackground;
-        console.log({ cForeground }, { cbackground });
       },
     });
   }
