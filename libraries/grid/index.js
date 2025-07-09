@@ -151,7 +151,10 @@ export const grid = function (settings) {
 		if (direction === 'horizontal') {
 			config.columns[index / 2] = value;
 			updateRequired = true;
-			console.log(config.columns);
+		}
+		if (direction === 'vertical') {
+			config.rows[index / 2] = value;
+			updateRequired = true;
 		}
 	}
 

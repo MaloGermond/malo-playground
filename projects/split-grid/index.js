@@ -47,7 +47,7 @@ window.mousePressed = function () {
     // g.resize({ index: item.column, value: 20 });
     animate({
       from: item.width,
-      to: 40,
+      to: 80,
       duration: 300,
       ease: easeInOut,
       onUpdate: (latest) => {
