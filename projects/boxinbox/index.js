@@ -2,6 +2,8 @@
 import { animate, easeInOut } from 'https://cdn.skypack.dev/popmotion';
 import { hexToHsl, hslToHex } from '/libraries/utils/index.js';
 
+/// Maintenant que c'est fait je réalise qu'il faudrait passer ca sous forme de module pour pouvoir l'appeler plus facilement... arf
+
 const test = grid;
 
 let instance = {};

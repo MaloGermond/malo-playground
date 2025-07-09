@@ -147,6 +147,14 @@ export const grid = function (settings) {
 		return index; // pas trouvé (en dehors des bornes)
 	}
 
+	function resize({ direction = 'horizontal', index = 0, value = '1fr' }) {
+		if (direction === 'horizontal') {
+			config.columns[index / 2] = value;
+			updateRequired = true;
+			console.log(config.columns);
+		}
+	}
+
 	function display() {
 		computeGrid();
 
@@ -192,6 +200,7 @@ export const grid = function (settings) {
 		config,
 		display,
 		getCell,
+		resize,
 	};
 };
 

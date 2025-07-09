@@ -31,6 +31,7 @@ window.draw = function () {
   const item = g.getCell(mouseX, mouseY);
   if (item && item.type === 'cell') {
     // console.log(item);
+
     push();
     noStroke();
     fill('#D8DFFF');
@@ -42,11 +43,21 @@ window.draw = function () {
 window.mousePressed = function () {
   const item = g.getCell(mouseX, mouseY);
   if (item && item.type === 'cell') {
-    console.log(item.column);
+    console.log(item);
+    // g.resize({ index: item.column, value: 20 });
+    animate({
+      from: item.width,
+      to: 40,
+      duration: 300,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        g.resize({ index: item.column, value: latest });
+      },
+    });
+
     // OK donc ici j'ai un problème car
     // g.config.layout.columns.spans[item.column] != g.config.column
     // Donc si je veux faire des modifications pour la taille des columns je me retrouve entre deux types de definition. Une ou les gutters sont definis et une autre ou non.
-    console.log(g.config.layout.columns.spans[item.column]);
   }
 };
 
