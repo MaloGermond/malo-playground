@@ -1,39 +1,56 @@
 //import motion from "./src/motion.js"
 import { animate, easeInOut } from 'https://cdn.skypack.dev/popmotion';
+import { hexToHsl, hslToHex } from '/libraries/utils/index.js';
 
 const test = grid;
 
 let instance = {};
 
+const setting = {
+  size: {
+    min: { w: 50, h: 50 },
+    max: { w: 400, h: 400 },
+  },
+};
+
 window.setup = function () {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1080 / 2, 1920 / 2);
   //frameRate(5)
   //motion.to(instance, { color: "#91E939" }, 3000)
   // console.log(motion.debug())
   // createBoxes(5);
   instance = {
     pos: {
-      x: 200,
-      y: 200,
+      x: width / 2,
+      y: height / 2,
     },
     size: {
       w: 80,
       h: 200,
     },
     depth: 15,
-    color: '#0E2431',
+    colorForeground: '#0E2431',
+    colorBackground: 'ECEFF2',
     pov: {
       x: random(0, 100),
       y: random(0, 100),
     },
   };
+
   // test.set({ width: windowWidth - 200, height: windowHeight - 200 });
 };
 
 window.draw = function () {
   background('#F8F9FA');
   // boxes.map((el) => drawBox(el.pos, el.size, el.pov, el.scale));
-  drawBox({ pos: instance.pos, size: instance.size, pov: instance.pov, depth: instance.depth });
+  drawBox({
+    pos: instance.pos,
+    size: instance.size,
+    pov: instance.pov,
+    depth: instance.depth,
+    background: instance.colorBackground,
+    foreground: instance.colorForeground,
+  });
   motion.play();
   // console.log(motion.debug());
 };
@@ -49,7 +66,7 @@ window.keyPressed = function () {
   if (keyCode == 70) {
     animate({
       from: instance.pov.x,
-      to: random(0, 100),
+      to: random(-100, 100),
       duration: 1500,
       ease: easeInOut,
       onUpdate: (latest) => {
@@ -59,7 +76,7 @@ window.keyPressed = function () {
 
     animate({
       from: instance.pov.y,
-      to: random(0, 100),
+      to: random(-100, 100),
       duration: 1500,
       ease: easeInOut,
       onUpdate: (latest) => {
@@ -71,7 +88,7 @@ window.keyPressed = function () {
   if (keyCode == 83) {
     animate({
       from: instance.size.w,
-      to: random(40, 200),
+      to: random(setting.size.min.w, setting.size.max.w),
       duration: 1500,
       ease: easeInOut,
       onUpdate: (latest) => {
@@ -80,7 +97,7 @@ window.keyPressed = function () {
     });
     animate({
       from: instance.size.h,
-      to: random(40, 200),
+      to: random(setting.size.min.h, setting.size.max.h),
       duration: 1500,
       ease: easeInOut,
       onUpdate: (latest) => {
@@ -101,6 +118,42 @@ window.keyPressed = function () {
     });
   }
 
+  if (keyCode == 67) {
+    animate({
+      from: hexToHsl(instance.colorForeground).h,
+      to: random(0, 255),
+      duration: 1500,
+      onUpdate: (latest) => {
+        const cForeground = hslToHex(latest, 0.6, 0.9);
+        const cbackground = hslToHex(latest, 0.1, 0.1);
+        instance.colorForeground = cForeground;
+        instance.colorBackground = cbackground;
+        console.log({ cForeground }, { cbackground });
+      },
+    });
+  }
+
+  if (keyCode == 71) {
+    animate({
+      from: instance.size.w,
+      to: 1080 / 2,
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.size.w = latest;
+      },
+    });
+    animate({
+      from: instance.size.h,
+      to: 1920 / 2,
+      duration: 1500,
+      ease: easeInOut,
+      onUpdate: (latest) => {
+        instance.size.h = latest;
+      },
+    });
+  }
+
   //console.log(instance.pov)
   // boxes.map((el) =>
   //   motion.to(el.pov, { x: random(0, 100), y: random(0, 100) }, 1500, {
@@ -112,7 +165,7 @@ window.keyPressed = function () {
   // );
 };
 
-function drawBox({ pos, size, pov, depth }) {
+function drawBox({ pos, size, pov, depth, background, foreground }) {
   push();
   rectMode(CENTER);
   beginClip();
@@ -123,23 +176,19 @@ function drawBox({ pos, size, pov, depth }) {
   noStroke();
   //rect(pos.x, pos.y, size.w, size.h)
 
-  // Calculate rectangle size when we apply depth
-  const offsetW = map(depth, 0, 10, 0, size.w);
-  const offsetH = map(depth, 0, 10, 0, size.h);
-
-  // Allow a Point Of View (POV) offset to go father than inside the rectangle
-  const offsetX = offsetW / 5;
-  const offsetY = offsetH / 5;
+  // Offset the focal point (POV) to be able to go outside the main frame.
+  const offsetX = 20;
+  const offsetY = 20;
 
   // Calculate the Point Of View (POV) postion.
-  const povX = map(pov.x, 0, 100, -offsetX, size.w + offsetX);
-  const povY = map(pov.y, 0, 100, -offsetY, size.h + offsetY);
+  const povX = map(pov.x, -100, 100, -size.w / 2 - offsetX, size.w / 2 + offsetX);
+  const povY = map(pov.y, -100, 100, -size.h / 2 - offsetY, size.h / 2 + offsetY);
 
   translate(pos.x, pos.y);
 
   push();
   for (let i = depth; i > 0; i--) {
-    fill(lerpHex('#0E2431', '#ECEFF2', map(i, 0, depth, 0, 1)));
+    fill(lerpHex(background, foreground, map(i, 0, depth, 0, 1)));
     rect(
       map(i, 0, depth, povX, 0),
       map(i, 0, depth, povY, 0),
@@ -194,4 +243,29 @@ function getRandomHexColor() {
 
   // Pad the color with zeros if needed
   return `#${randomColor.padStart(6, '0')}`;
+}
+
+function toHexColor(inputColor) {
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.fillStyle = inputColor; // CSS parser convertit
+  const computed = ctx.fillStyle;
+
+  // Si déjà hex
+  if (computed.startsWith('#')) {
+    if (computed.length === 4) {
+      // Format #rgb → #rrggbb
+      return '#' + computed[1].repeat(2) + computed[2].repeat(2) + computed[3].repeat(2);
+    }
+    return computed;
+  }
+
+  // Si rgb ou rgba → extraire et convertir
+  const rgb = computed.match(/\d+/g).map(Number);
+  return (
+    '#' +
+    rgb
+      .slice(0, 3) // ignore alpha
+      .map((x) => x.toString(16).padStart(2, '0'))
+      .join('')
+  );
 }
