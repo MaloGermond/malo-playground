@@ -3,7 +3,7 @@ import path from 'path';
 
 const args = process.argv.slice(2);
 if (args.length === 0) {
-  console.error('❌ Veuillez fournir un nom de projet. Ex: yarn new mon_projet');
+  console.error('❌ Veuillez fournir un nom de projet. Ex: npm run new mon_projet');
   process.exit(1);
 }
 
