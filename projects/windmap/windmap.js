@@ -22,6 +22,7 @@ export const windmap = function (settings) {
 		return;
 	}
 
+	// Create the grid that will be use for defining winds effect areas.
 	function computeGrid(cols = config.columns, rows = config.rows) {
 		const grid = Array.from({ length: rows * cols }, (_, index) => {
 			const row = Math.floor(index / cols);
@@ -35,7 +36,22 @@ export const windmap = function (settings) {
 		return grid;
 	}
 
-	function addWind(start, end) {
+	function addWind(x1, y1, x2, y2) {
+		const dx = x2 - x1;
+		const dy = y2 - y1;
+		const length = Math.sqrt(dx * dx + dy * dy);
+		const vector = { x: dx, y: dy };
+		const direction = { x: dx / length, y: dy / length };
+		const angle = Math.atan2(direction.y, direction.x);
+
+		config.winds.push({
+			start: { x: x1, y: y1 },
+			end: { x: x2, y: y2 },
+			vector,
+			direction,
+			force: length,
+			angle,
+		});
 		return;
 	}
 
@@ -43,10 +59,12 @@ export const windmap = function (settings) {
 		return;
 	}
 
+	// Instances are items that will be affected by winds
 	function addInstance() {
 		return;
 	}
 
+	// Return instances position and winds effect informations
 	function getInstance() {
 		return;
 	}
@@ -70,18 +88,36 @@ export const windmap = function (settings) {
 		return;
 	}
 
+	function displayWinds() {
+		push();
+		noFill();
+		config.winds.map((wind) => {
+			push();
+			translate(wind.start.x, wind.start.y);
+			rotate(wind.angle);
+			stroke('#000');
+			line(0, 0, wind.force, 0);
+			fill('#000');
+			triangle(wind.force - 10, -5, wind.force, 0, wind.force - 10, 5);
+			pop();
+		});
+		pop();
+		return;
+	}
+
 	function displayWindmap() {
 		return;
 	}
 	return {
 		create,
-		computeGrid,
-		computeWind,
-		displayGrid,
-		displayWindmap,
 		addWind,
 		addInstance,
 		getInstance,
+		computeGrid,
+		computeWind,
 		computeForces,
+		displayGrid,
+		displayWinds,
+		displayWindmap,
 	};
 };
