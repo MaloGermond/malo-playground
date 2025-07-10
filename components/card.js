@@ -71,11 +71,3 @@ class ProjectCard extends HTMLElement {
 }
 
 customElements.define('project-card', ProjectCard);
-
-/* Group 9 */
-
-// /* Inside auto layout */
-// flex: none;
-// order: 1;
-// flex-grow: 0;
-// z-index: 1;
