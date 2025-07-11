@@ -6,9 +6,10 @@ const field = windmap({ width: 500, height: 800, columns: 50, rows: 30 });
 const bubble = particleSystem({
   lifespan: 1000,
   speedLimit: 20,
+  boundary: { width: 500, height: 800, behaviour: 'wrap', x: 0, y: 0 },
   getForce: (x, y) => {
     const force = field.getWindForceAt(x, y);
-    return { x: force.vector.x, y: force.vector.y, mag: force.magnitude };
+    return { x: force.vector.x, y: force.vector.y };
   },
 });
 

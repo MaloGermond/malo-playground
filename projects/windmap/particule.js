@@ -6,6 +6,7 @@ export function particleSystem(config = {}) {
 		getForce: () => ({ x: 0, y: 0 }), // une fonction pour calculer la force (ex: vent)
 		debug: false,
 		speedLimit: Infinity,
+		boundary: { x: 0, y: 0, width: 200, height: 200, behaviour: 'none' }, //'none', 'bounce', 'wrap'
 		...config,
 	};
 
@@ -34,14 +35,49 @@ export function particleSystem(config = {}) {
 			// Limite de l'acceleration
 			const acc = limitVector({ x, y }, settings.speedLimit);
 
-			p.x += acc.x;
-			p.y += acc.y;
+			const pos = handleBoundary(p.x + acc.x, p.y + acc.y, settings.boundary);
+			p.x = pos.x;
+			p.y = pos.y;
+
+			console.log(p.x);
 
 			p.life += 1;
 		});
 
 		// Supprime les particules trop vieilles
 		particles = particles.filter((p) => p.life < settings.lifespan);
+	}
+
+	function handleBoundary(x, y, boundary = settings.boundary) {
+		if (boundary.behaviour === 'wrap') {
+			return handleBondaryWrap(x, y, boundary);
+		}
+		// if (settings.boundary.behaviour === 'bounce') {
+		// 	if (p.x < x || p.x > x + width) {
+		// 		p.velocity.x *= -1;
+		// 		p.x = Math.max(x, Math.min(p.x, x + width));
+		// 	}
+		// 	if (p.y < y || p.y > y + height) {
+		// 		p.velocity.y *= -1;
+		// 		p.y = Math.max(y, Math.min(p.y, y + height));
+		// 	}
+		// } else if (settings.boundary.behaviour === 'wrap') {
+		// 	if (p.x < x) p.x = x + width;
+		// 	else if (p.x > x + width) p.x = x;
+		// 	if (p.y < y) p.y = y + height;
+		// 	else if (p.y > y + height) p.y = y;
+		// }
+		// 'none' → on ne fait rien
+		return { x: x, y: y };
+	}
+
+	function handleBondaryWrap(x, y, boundary) {
+		if (x < boundary.x) x = x + boundary.width;
+		if (x > boundary.x + boundary.width) x = boundary.x;
+		if (y < boundary.y) y = boundary.y + boundary.height;
+		else if (y > boundary.y + boundary.height) y = boundary.y;
+
+		return { x: x, y: y };
 	}
 
 	function draw(drawFn) {
