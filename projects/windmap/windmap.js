@@ -14,15 +14,15 @@ export const windmap = function (settings) {
 		...settings,
 	};
 
-	function create() {
-		config.grid = computeGrid();
+	function init() {
+		config.grid = generateGrid();
 		config.windmap = computeWindmap(config.grid, config.winds);
 		console.log({ config });
 		return;
 	}
 
 	// Create the grid that will be use for defining winds effect areas.
-	function computeGrid(cols = config.columns, rows = config.rows) {
+	function generateGrid(cols = config.columns, rows = config.rows) {
 		const grid = Array.from({ length: rows * cols }, (_, index) => {
 			const row = Math.floor(index / cols);
 			const col = index % cols;
@@ -65,21 +65,6 @@ export const windmap = function (settings) {
 
 		return windmap;
 	}
-
-	// Instances are items that will be affected by winds
-	function addInstance() {
-		return;
-	}
-
-	// Return instances position and winds effect informations
-	function getInstance() {
-		return;
-	}
-
-	function computeForces() {
-		return;
-	}
-
 	function resolveWindEffect(x, y, winds = config.winds) {
 		// 1. Calculer le facteur d'influence du vecteur wind sur le point. (Plus il est loins moins il a d'influence.)
 		// 2. Multiplier pour chaque vecteur wind par le facteur d'influence de chacun des vecteurs
@@ -124,6 +109,26 @@ export const windmap = function (settings) {
 			y: v.y + t * (w.y - v.y),
 		};
 		return Math.hypot(p.x - proj.x, p.y - proj.y);
+	}
+
+	function getWindForceAt(x, y, winds = config.winds) {
+		const position = { x, y };
+		const vector = winds.reduce(
+			(acc, wind) => {
+				const dist = distancePointToSegment(position, wind.start, wind.end);
+				const influence = 1 / (dist + 1);
+				acc.x += wind.vector.x * influence;
+				acc.y += wind.vector.y * influence;
+				return acc;
+			},
+			{ x: 0, y: 0 }
+		);
+
+		const magnitude = Math.hypot(vector.x, vector.y);
+		const direction = { x: vector.x / magnitude, y: vector.y / magnitude };
+		const angle = Math.atan2(direction.y, direction.x);
+
+		return { position, vector, magnitude, direction, angle };
 	}
 
 	function displayGrid(x = 0, y = 0) {
@@ -175,13 +180,11 @@ export const windmap = function (settings) {
 		return;
 	}
 	return {
-		create,
+		init,
 		addWind,
-		addInstance,
-		getInstance,
-		computeGrid,
+		generateGrid,
 		computeWindmap,
-		computeForces,
+		getWindForceAt,
 		displayGrid,
 		displayWinds,
 		displayWindmap,
