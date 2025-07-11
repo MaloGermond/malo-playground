@@ -5,6 +5,7 @@ export function particleSystem(config = {}) {
 		spawnArea: { x: 0, y: 0, width: 100, height: 100 },
 		getForce: () => ({ x: 0, y: 0 }), // une fonction pour calculer la force (ex: vent)
 		debug: false,
+		speedLimit: Infinity,
 		...config,
 	};
 
@@ -27,13 +28,14 @@ export function particleSystem(config = {}) {
 	function update() {
 		// Met à jour les particules existantes
 		particles.forEach((p) => {
-			const force = settings.getForce(p.x, p.y);
-			console.log({ force });
-			p.velocity.x += force.x;
-			p.velocity.y += force.y;
+			// Calcule de la somme des forces exercé sur la particule
+			const { x, y } = settings.getForce(p.x, p.y);
 
-			p.x += p.velocity.x;
-			p.y += p.velocity.y;
+			// Limite de l'acceleration
+			const acc = limitVector({ x, y }, settings.speedLimit);
+
+			p.x += acc.x;
+			p.y += acc.y;
 
 			p.life += 1;
 		});
@@ -52,4 +54,16 @@ export function particleSystem(config = {}) {
 		draw,
 		getParticles: () => particles,
 	};
+}
+
+function limitVector(v, max) {
+	const mag = Math.hypot(v.x, v.y);
+	if (mag > max) {
+		const factor = max / mag;
+		return {
+			x: v.x * factor,
+			y: v.y * factor,
+		};
+	}
+	return v; // déjà sous la limite
 }

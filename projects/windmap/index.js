@@ -5,9 +5,10 @@ import { particleSystem } from './particule.js';
 const field = windmap({ width: 500, height: 800, columns: 50, rows: 30 });
 const bubble = particleSystem({
   lifespan: 1000,
+  speedLimit: 20,
   getForce: (x, y) => {
     const force = field.getWindForceAt(x, y);
-    return { x: force.vector.x, y: force.vector.y };
+    return { x: force.vector.x, y: force.vector.y, mag: force.magnitude };
   },
 });
 
