@@ -1,9 +1,9 @@
 import { animate } from 'https://cdn.skypack.dev/popmotion';
 import { windmap } from './windmap.js';
-import { particleSystem } from './particule.js';
+import { particuleSystem } from './particule.js';
 
 const field = windmap({ width: 500, height: 800, columns: 50, rows: 30 });
-const bubble = particleSystem({
+const bubble = particuleSystem({
   lifespan: 1000,
   speedLimit: 20,
   boundary: { width: 500, height: 800, behaviour: 'wrap', x: 0, y: 0 },
@@ -29,7 +29,7 @@ window.draw = function () {
   noStroke();
   fill('#0f0');
   bubble.draw((el) => {
-    ellipse(el.x, el.y, 20, 20);
+    ellipse(el.x, el.y, 50, 50);
   });
   pop();
   // console.log(
@@ -68,7 +68,8 @@ window.keyPressed = function () {
   console.log({ keyCode });
 
   if (keyCode === 32) {
-    bubble.add(mouseX, mouseY);
+    // bubble.add(mouseX, mouseY);
+    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 10, width: 100 });
     // console.log(bubble.getParticles());
   }
 };

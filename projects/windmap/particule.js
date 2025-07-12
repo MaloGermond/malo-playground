@@ -1,8 +1,7 @@
-// particleSystem.js
-export function particleSystem(config = {}) {
+// particulesystem.js
+export function particuleSystem(config = {}) {
 	const settings = {
 		lifespan: 120, // in frames
-		spawnArea: { x: 0, y: 0, width: 100, height: 100 },
 		getForce: () => ({ x: 0, y: 0 }), // une fonction pour calculer la force (ex: vent)
 		debug: false,
 		speedLimit: Infinity,
@@ -10,25 +9,38 @@ export function particleSystem(config = {}) {
 		...config,
 	};
 
-	let particles = [];
+	let particules = [];
+	const spawn = [];
 
-	function spawn() {
-		const { x, y, width, height } = settings.spawnArea;
-		const px = x + Math.random() * width;
-		const py = y + Math.random() * height;
-		const velocity = { x: 0, y: 0 };
-		const life = 0;
-		return { x: px, y: py, velocity, life };
+	function addSpawn({
+		x,
+		y,
+		width = 1,
+		height = 1,
+		velocity = { x: 0, y: 0 },
+		rate = 10,
+		duration = 99999999,
+	}) {
+		spawn.push({ x, y, width, height, velocity, rate, duration });
+		return;
 	}
 
 	function add(x = 0, y = 0, velocity = { x: 0, y: 0 }, life = 0) {
-		particles.push({ x: x, y: y, velocity, life });
+		particules.push({ x: x, y: y, velocity, life });
 		return;
 	}
 
 	function update() {
 		// Met à jour les particules existantes
-		particles.forEach((p) => {
+		spawn.map((p) => {
+			p.duration -= 1;
+			if (p.duration % p.rate === 0) {
+				const x = p.x + random(-p.width / 2, p.width / 2);
+				const y = p.y + random(-p.height / 2, p.height / 2);
+				add(x, y, p.velocity);
+			}
+		});
+		particules.forEach((p) => {
 			// Calcule de la somme des forces exercé sur la particule
 			const { x, y } = settings.getForce(p.x, p.y);
 
@@ -39,13 +51,11 @@ export function particleSystem(config = {}) {
 			p.x = pos.x;
 			p.y = pos.y;
 
-			console.log(p.x);
-
 			p.life += 1;
 		});
 
 		// Supprime les particules trop vieilles
-		particles = particles.filter((p) => p.life < settings.lifespan);
+		particules = particules.filter((p) => p.life < settings.lifespan);
 	}
 
 	function handleBoundary(x, y, boundary = settings.boundary) {
@@ -81,14 +91,15 @@ export function particleSystem(config = {}) {
 	}
 
 	function draw(drawFn) {
-		particles.forEach((p) => drawFn(p));
+		particules.forEach((p) => drawFn(p));
 	}
 
 	return {
 		add,
+		addSpawn,
 		update,
 		draw,
-		getParticles: () => particles,
+		getparticules: () => particules,
 	};
 }
 
