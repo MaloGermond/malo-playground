@@ -16,11 +16,13 @@ const bubble = particuleSystem({
   },
 });
 
+let background_img;
 let foreground;
 
 window.setup = function () {
   createCanvas(config.width, config.height);
   field.init();
+  background_img = createGraphics(config.width, config.height);
   foreground = createGraphics(config.width, config.height);
 };
 
@@ -32,22 +34,31 @@ window.draw = function () {
 
   bubble.update();
   foreground.push();
+  background_img.push();
   foreground.noStroke();
+  background_img.noStroke();
   bubble.draw((el) => {
-    const size = map(el.life, 0, 500, 100, 0);
-    foreground.fill('#9CACDF');
-    foreground.ellipse(el.x, el.y, size, size);
-    foreground.fill('#35437D');
-    foreground.ellipse(el.x + size / 2, el.y, size / 2, size / 2);
+    // const size = map(el.life, 0, 500, 100, 0);
+    const size = 80;
+    const sizeLight = size / 3;
+    background_img.fill(0, 0, 0, 125);
+    background_img.ellipse(el.x, el.y + sizeLight, sizeLight, sizeLight);
+    background_img.fill('#9CACDF');
+    background_img.ellipse(el.x, el.y, size, size);
+    foreground.fill(256, 256, 256, 200);
+    foreground.ellipse(el.x, el.y - sizeLight, sizeLight, sizeLight);
   });
   foreground.pop();
   foreground.filter(BLUR, 2);
+  background_img.pop();
+  background_img.filter(BLUR, 1);
 
   push();
 
   stroke('#D0D0D0');
-  fill('#FFFFFF');
+  fill('#FFF');
   rect(0, 0, 200, 200);
+  image(background_img, 0, 0, 200, 200);
   image(foreground, 0, 0, 200, 200);
 
   pop();
