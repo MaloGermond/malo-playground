@@ -16,9 +16,12 @@ const bubble = particuleSystem({
   },
 });
 
+let foreground;
+
 window.setup = function () {
   createCanvas(config.width, config.height);
   field.init();
+  foreground = createGraphics(config.width, config.height);
 };
 
 window.draw = function () {
@@ -28,16 +31,24 @@ window.draw = function () {
   field.displayWindmap();
 
   bubble.update();
-  push();
-  noStroke();
+  foreground.push();
+  foreground.noStroke();
   bubble.draw((el) => {
     const size = map(el.life, 0, 500, 100, 0);
-    fill('#9CACDF');
-    ellipse(el.x, el.y, size, size);
+    foreground.fill('#9CACDF');
+    foreground.ellipse(el.x, el.y, size, size);
+    foreground.fill('#35437D');
+    foreground.ellipse(el.x + size / 2, el.y, size / 2, size / 2);
   });
-  pop();
+  foreground.pop();
+  foreground.filter(BLUR, 2);
 
   push();
+
+  stroke('#D0D0D0');
+  fill('#FFFFFF');
+  rect(0, 0, 200, 200);
+  image(foreground, 0, 0, 200, 200);
 
   pop();
   // console.log(
@@ -76,8 +87,8 @@ window.keyPressed = function () {
   console.log({ keyCode });
 
   if (keyCode === 32) {
-    // bubble.add(mouseX, mouseY);
-    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 20 });
+    bubble.add(mouseX, mouseY);
+    // bubble.addSpawn({ x: mouseX, y: mouseY, rate: 5 });
     // console.log(bubble.getParticles());
   }
 };
