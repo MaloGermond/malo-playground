@@ -1,21 +1,27 @@
-import { animate } from 'https://cdn.skypack.dev/popmotion';
 import { windmap } from './windmap.js';
 import { particuleSystem } from './particule.js';
 
-const field = windmap({ width: 500, height: 800, columns: 50, rows: 30 });
+const config = {
+  width: 500,
+  height: 500,
+};
+const field = windmap({ width: config.width, height: config.height, columns: 50, rows: 30 });
 const bubble = particuleSystem({
-  lifespan: 1000,
+  lifespan: 500,
   speedLimit: 20,
-  boundary: { width: 500, height: 800, behaviour: 'wrap', x: 0, y: 0 },
+  boundary: { width: config.width, height: config.height, behaviour: 'wrap', x: 0, y: 0 },
   getForce: (x, y) => {
     const force = field.getWindForceAt(x, y);
     return { x: force.vector.x, y: force.vector.y };
   },
 });
 
+let foreground;
+
 window.setup = function () {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(config.width, config.height);
   field.init();
+  foreground = createGraphics(config.width, config.height);
 };
 
 window.draw = function () {
@@ -25,12 +31,23 @@ window.draw = function () {
   field.displayWindmap();
 
   bubble.update();
-  push();
-  noStroke();
-  fill('#0f0');
+  foreground.background('#4A5EB0');
+  foreground.push();
+  foreground.noStroke();
   bubble.draw((el) => {
-    ellipse(el.x, el.y, 50, 50);
+    const size = map(el.life, 0, 500, 100, 0);
+    foreground.fill('#9CACDF');
+    foreground.ellipse(el.x, el.y, size, size);
+    foreground.fill('#35437D');
+    foreground.ellipse(el.x + size / 2, el.y, size / 2, size / 2);
   });
+  foreground.pop();
+  foreground.filter(BLUR, 10);
+
+  push();
+
+  image(foreground, 0, 0, 200, 200);
+
   pop();
   // console.log(
   //   field.distanceToSegment({ x: mouseX, y: mouseY }, { x: 20, y: 30 }, { x: 200, y: 100 })
@@ -69,7 +86,7 @@ window.keyPressed = function () {
 
   if (keyCode === 32) {
     // bubble.add(mouseX, mouseY);
-    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 10, width: 100 });
+    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 5 });
     // console.log(bubble.getParticles());
   }
 };
