@@ -20,6 +20,8 @@ window.setup = function () {
 
 window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
+  config.letter.unitWidth = mouseX;
+  config.letter.ascender = mouseY;
   noStroke();
   fill('#000');
   rect(
@@ -37,8 +39,8 @@ window.draw = function () {
   rect(
     config.letter.x + config.letter.weight,
     config.letter.y,
-    config.letter.xHeight - 2 * config.letter.weight,
-    -config.letter.xHeight - config.letter.weight,
+    config.letter.unitWidth - 2 * config.letter.weight,
+    -config.letter.ascender + config.letter.weight,
     0,
     0,
     config.letter.unitWidth,
