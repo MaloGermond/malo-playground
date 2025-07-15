@@ -93,25 +93,29 @@ export default function path({ points = [], resolution = 5 } = {}) {
 
 	// Draw
 
-	function draw({ weight = 3, fillColor = false, strokeColor = '#000' } = {}) {
-		fillColor ? fill(fillColor) : noFill();
-		strokeColor ? stroke(strokeColor) : noStroke();
-		strokeWeight(weight);
+	function draw({ ctx = null, weight = 3, fillColor = false, strokeColor = '#000' } = {}) {
+		const g = ctx || window;
+
+		g.push();
+		fillColor ? g.fill(fillColor) : g.noFill();
+		strokeColor ? g.stroke(strokeColor) : g.noStroke();
+		g.strokeWeight(weight);
 
 		if (type === 'curve') {
-			drawCurve();
+			drawCurve(g);
 		}
 		if (type === 'bezier') {
-			drawBezier();
+			drawBezier(g);
 		}
+		g.pop();
 	}
 
-	function drawCurve() {
+	function drawCurve(g) {
 		if (points.length <= 4) {
 			return;
 		}
 		// First part of the curve
-		curve(
+		g.curve(
 			points[0].x,
 			points[0].y,
 			points[0].x,
@@ -124,7 +128,7 @@ export default function path({ points = [], resolution = 5 } = {}) {
 
 		points.slice(0, points.length - 3).map((point, i) => {
 			const originalIndex = i;
-			curve(
+			g.curve(
 				points[originalIndex].x,
 				points[originalIndex].y,
 				points[originalIndex + 1].x,
@@ -137,7 +141,7 @@ export default function path({ points = [], resolution = 5 } = {}) {
 		});
 
 		// Last part of the curve
-		curve(
+		g.curve(
 			points[points.length - 3].x,
 			points[points.length - 3].y,
 			points[points.length - 2].x,
@@ -149,7 +153,7 @@ export default function path({ points = [], resolution = 5 } = {}) {
 		);
 	}
 
-	function drawBezier() {}
+	function drawBezier(g) {}
 
 	return {
 		add,
