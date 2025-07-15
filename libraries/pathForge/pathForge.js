@@ -1,4 +1,8 @@
-export default function spline({ points = [], resolution = 5 } = {}) {
+// TODO
+// [] Manage Bezier
+// []
+
+export default function path({ points = [], resolution = 5 } = {}) {
 	let type = 'curve'; // ou 'polyline' etc. (extensible)
 
 	function add(point) {
