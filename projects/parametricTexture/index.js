@@ -4,7 +4,7 @@ const config = {
   width: 500,
   height: 500,
 };
-const field = windmap({ width: config.width, height: config.height, columns: 20, rows: 20 });
+const field = windmap({ width: config.width, height: config.height, columns: 4, rows: 4 });
 
 window.setup = function () {
   createCanvas(config.width, config.height);
@@ -29,15 +29,17 @@ function displayHash(x, y, width, height, density, angle) {
 
   push();
   translate(x, y);
-  // beginClip();
-  // rect(0, 0, width, height);
-  // endClip();
+  beginClip();
+  rect(0, 0, width, height);
+  endClip();
 
-  // translate(-width / 2, -height / 2);
-  // rotate(angle);
+  translate(width / 2, height / 2); // Centre du rectangle
+  rotate(angle); // Rotation centrée
+  translate(-width / 2, -height / 2); // Revenir au coin supérieur gauche du rect
+
   stroke('#000');
-  for (var i = width - 1; i >= 0; i -= width / density) {
-    line(i, 0, i, height);
+  for (let i = width * 1.5; i >= -width; i -= width / density) {
+    line(i, -height, i, height * 1.5);
   }
 
   pop();
