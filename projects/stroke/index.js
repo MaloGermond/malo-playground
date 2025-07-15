@@ -1,27 +1,31 @@
+import spline from './splineForge.js';
+
 let points = new Array();
+const drawPath = spline();
 
-function setup() {
+window.setup = function () {
   createCanvas(windowWidth, windowHeight);
-  for (let i = 0; i < 4; i++) {
-    points.push(createVector(random(0, 400), random(0, 400)));
-  }
+};
 
-  //strokeWeight(20);
-  //points.map((p) => {
-  //  ellipse(p.x, p.y, 10, 10);
-  //});
-}
-
-function draw() {
+window.draw = function () {
   background(color('#F3F9F7'));
-  addPoint(mouseX, mouseY, 50);
-
-  if (points.length > 60) {
-    points = points.slice(1);
+  if (mouseIsPressed) {
+    // addPoint(mouseX, mouseY, 50);
+    drawPath.add({ x: mouseX, y: mouseY });
   }
 
-  drawCurve(points, 20, 50, '#F3F9F7', '#3C615A');
-}
+  drawPath.draw({ weight: 20 });
+
+  // if (points.length > 60) {
+  //   points = points.slice(1);
+  // }
+
+  // drawCurve(points, 20, 50, '#F3F9F7', '#3C615A');
+};
+
+window.mousePressed = function () {
+  drawPath.clear();
+};
 
 function addPoint(x, y, d) {
   const distance = dist(points[points.length - 1].x, points[points.length - 1].y, x, y);
