@@ -16,7 +16,8 @@ const bubble = particuleSystem({
     return { x: force.vector.x, y: force.vector.y };
   },
 });
-let wave = path();
+let mainLine = path();
+let darkLine = path();
 
 let background_img;
 let foreground;
@@ -36,9 +37,17 @@ window.draw = function () {
 
   bubble.update();
 
-  wave = path({ points: bubble.getparticules() });
+  foreground.background('#fff');
 
-  wave.draw({ ctx: foreground, strokeColor: '#9CACDF', weight: 20 });
+  mainLine = path({ points: bubble.getparticules() });
+  darkLine = mainLine;
+
+  mainLine.draw({ ctx: foreground, strokeColor: '#9CACDF', weight: 200 });
+  foreground.push();
+  foreground.translate(100, -100);
+  darkLine.draw({ ctx: foreground, strokeColor: '#0E0E80', weight: 50 });
+  foreground.pop();
+
   // foreground.push();
   // background_img.push();
   // foreground.noStroke();
@@ -55,7 +64,7 @@ window.draw = function () {
   //   foreground.ellipse(el.x, el.y - sizeLight, sizeLight, sizeLight);
   // });
   // foreground.pop();
-  // foreground.filter(BLUR, 2);
+  foreground.filter(BLUR, 10);
   // background_img.pop();
   // background_img.filter(BLUR, 1);
 
@@ -105,7 +114,7 @@ window.keyPressed = function () {
 
   if (keyCode === 32) {
     // bubble.add(mouseX, mouseY);
-    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 50 });
+    bubble.addSpawn({ x: mouseX, y: mouseY, rate: 20 });
     // console.log(bubble.getParticles());
   }
 };
