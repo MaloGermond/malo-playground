@@ -4,7 +4,7 @@ const config = {
   width: 500,
   height: 500,
 };
-const field = windmap({ width: config.width, height: config.height, columns: 4, rows: 4 });
+const field = windmap({ width: config.width, height: config.height, columns: 30, rows: 30 });
 
 window.setup = function () {
   createCanvas(config.width, config.height);
@@ -19,7 +19,7 @@ window.draw = function () {
   // console.log(field.getWindmap());
   field.getGrid().map((cell) => {
     const f = field.getWindForceAt(cell.center.x, cell.center.y);
-    const d = map(f.angle, -PI, PI, 2, 20);
+    const d = map(f.angle, -PI, PI, 2, 10@);
     displayHash(cell.x, cell.y, cell.width, cell.height, d, f.angle);
   });
 };
