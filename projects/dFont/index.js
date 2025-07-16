@@ -113,6 +113,13 @@ function fontRules({
       left: { x: 0, y: centerY },
     };
 
+    // Taille du fut
+    const stemFactor = props.stemFactor ?? 0.1;
+    const stem = props.stem ?? unitWidth * stemFactor;
+
+    const contrast = props.contrast ?? 0.8;
+    const stemContrast = stem * contrast;
+
     const rules = {
       x: props.x,
       y: props.y,
@@ -125,6 +132,8 @@ function fontRules({
       centerX: centerX,
       centerY: centerY,
       anchor: anchor,
+      stem: stem,
+      stemContrast: stemContrast,
     };
 
     return rules;
@@ -178,18 +187,12 @@ function fontRules({
     pop();
   }
 
+  function drawChar() {}
+
   return {
     ...props,
     drawGuides,
   };
-}
-
-function letterN({ x, y, unitWidth, xHeight, ascender, weight } = {}) {
-  push();
-  fill('#000');
-  noStroke();
-  rect(x, y, unitWidth, -xHeight);
-  pop();
 }
 
 function letterAVersion1({ x, y, unitWidth, ascender, weight, barHeight, xHeight, contrast }) {
