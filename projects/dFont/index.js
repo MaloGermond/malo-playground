@@ -89,18 +89,19 @@ function fontRules({
     // Taille du caractère.
     const bodyHeight = props.height;
 
-    const descentFactor = 0.3;
+    const descentFactor = 0.2;
     // Ici je calcule la ligne de base par rapport à la hauteur des descendantes.
     const baseLine = props.height - props.height * descentFactor;
 
     // La descendantes est la taille la plus basse du corps, mais je laisse la possibilité d'avoir des descendantes qui sorte du charactère.
     const descent = props.descent ? props.height + props.descent : props.height;
 
+    const ascenderFactor = 0.3;
     // L'ascendantes et forcement la valeurs haute de l'espace disponible. Mais je laisse la possibilité de la faire sortir du cadre en fonction des besoins.
     const ascender = props.ascender ? props.ascender : 0;
 
     // Je choisis que la hauteur d'x n'est pas réglable. La hauteur prend la place qu'il reste après les descendantes et les ascendantes.
-    const xHeight = bodyHeight - ascender - baseLine;
+    const xHeight = bodyHeight * ascenderFactor;
 
     const centerX = unitWidth / 2;
     const centerY = bodyHeight / 2;
