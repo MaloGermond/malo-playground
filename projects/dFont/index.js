@@ -72,12 +72,15 @@ function fontRules({
 
   const c = {
     primary: '#FF49D4',
+    light: '#FBB2EA',
   };
 
   const config = computeRules(props);
   console.log({ config });
 
   function computeRules(props) {
+    // Ne pas oublier que l'origine est en haut à gauche. On dessine tout à "l'envert"
+
     // Réglage de la largeur.
     // Cela correspond à la chasse de la lettre
     const unitWidth = props.unitWidth ?? props.width;
@@ -100,6 +103,14 @@ function fontRules({
     const xHeight = bodyHeight - ascender - baseLine;
 
     const centerX = unitWidth / 2;
+    const centerY = bodyHeight / 2;
+
+    const anchor = {
+      top: { x: centerX, y: 0 },
+      right: { x: unitWidth, y: centerY },
+      bottom: { x: centerX, y: bodyHeight },
+      left: { x: 0, y: centerY },
+    };
 
     const rules = {
       x: props.x,
@@ -111,6 +122,8 @@ function fontRules({
       descent: descent,
       xHeight: xHeight,
       centerX: centerX,
+      centerY: centerY,
+      anchor: anchor,
     };
 
     return rules;
@@ -118,14 +131,24 @@ function fontRules({
 
   function drawGuides({ ctx = null } = {}) {
     const g = ctx || window;
-    const { x, y, unitWidth, bodyHeight, baseLine, ascender, xHeight } = config;
+    const { x, y, unitWidth, bodyHeight, baseLine, ascender, xHeight, anchor } = config;
 
     g.push();
     g.noFill();
-    g.stroke(c.primary);
     g.strokeWeight(1);
 
     translate(x, y);
+
+    // Affiche ce qui est secondaire (à l'arrière plan)
+    g.stroke(c.light);
+
+    // Position de l'axe vertical median
+    g.line(anchor.top.x, anchor.top.y, anchor.bottom.x, anchor.bottom.y);
+    // Position de l'axe horizontal median
+    g.line(anchor.left.x, anchor.left.y, anchor.right.x, anchor.right.y);
+
+    // Affiche ce qui est principal (au premier plan)
+    g.stroke(c.primary);
 
     // Gabarit de la charactère
     g.rect(0, 0 + bodyHeight, unitWidth, -bodyHeight);
