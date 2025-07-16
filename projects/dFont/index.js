@@ -21,7 +21,7 @@ import { animate } from 'https://cdn.skypack.dev/popmotion';
  *
  * --- Étape 2 : Dessin par le vide (soustraction) ---
  * On commence par dessiner un bloc plein représentant la lettre.
- * Puis on **retire des formes** (contreformes) pour créer la silhouette.
+ * Puis on **retire des formes** (contreformes/radicals) pour créer la silhouette.
  * Cette approche permet un contrôle précis et adaptable.
  *
  * --- Enjeu principal ---
@@ -38,7 +38,7 @@ const config = {
   height: 800,
 };
 
-const lettern = createLetterRules({ x: 100, y: 100, width: 300, height: 600 });
+let letters = fontRules({ x: 100, y: 100, width: 300, height: 600 });
 
 window.setup = function () {
   createCanvas(config.width, config.height);
@@ -47,10 +47,13 @@ window.setup = function () {
 window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
 
-  lettern.drawGuides();
+  if (mouseIsPressed) {
+    letters = fontRules({ x: 100, y: 100, width: mouseX, height: mouseY });
+  }
+  letters.drawGuides();
 };
 
-function createLetterRules({
+function fontRules({
   x = 0,
   y = 0,
   width = 200,
@@ -67,15 +70,47 @@ function createLetterRules({
     ...rest,
   };
 
+  const c = {
+    primary: '#FF49D4',
+  };
+
   const config = computeRules(props);
   console.log({ config });
 
   function computeRules(props) {
+    // Réglage de la largeur.
+    // Cela correspond à la chasse de la lettre
+    const unitWidth = props.unitWidth ?? props.width;
+
+    // Réglage des hauteurs
+    // Taille du caractère.
+    const bodyHeight = props.height;
+
+    const descentFactor = 0.3;
+    // Ici je calcule la ligne de base par rapport à la hauteur des descendantes.
+    const baseLine = props.height - props.height * descentFactor;
+
+    // La descendantes est la taille la plus basse du corps, mais je laisse la possibilité d'avoir des descendantes qui sorte du charactère.
+    const descent = props.descent ? props.height + props.descent : props.height;
+
+    // L'ascendantes et forcement la valeurs haute de l'espace disponible. Mais je laisse la possibilité de la faire sortir du cadre en fonction des besoins.
+    const ascender = props.ascender ? props.ascender : 0;
+
+    // Je choisis que la hauteur d'x n'est pas réglable. La hauteur prend la place qu'il reste après les descendantes et les ascendantes.
+    const xHeight = bodyHeight - ascender - baseLine;
+
+    const centerX = unitWidth / 2;
+
     const rules = {
       x: props.x,
       y: props.y,
-      unitWidth: props.unitWidth ?? props.width,
-      ascender: props.ascender ?? props.height,
+      unitWidth: unitWidth,
+      bodyHeight: bodyHeight,
+      baseLine: baseLine,
+      ascender: ascender,
+      descent: descent,
+      xHeight: xHeight,
+      centerX: centerX,
     };
 
     return rules;
@@ -83,20 +118,40 @@ function createLetterRules({
 
   function drawGuides({ ctx = null } = {}) {
     const g = ctx || window;
-    const { x, y, ascender, unitWidth } = config;
-    const c = {
-      primary: '#FF49D4',
-    };
+    const { x, y, unitWidth, bodyHeight, baseLine, ascender, xHeight } = config;
 
     g.push();
     g.noFill();
     g.stroke(c.primary);
     g.strokeWeight(1);
 
-    // Exemple : dessiner un simple rectangle pour symboliser la lettre
-    g.rect(x, y + ascender, unitWidth, -ascender);
+    translate(x, y);
+
+    // Gabarit de la charactère
+    g.rect(0, 0 + bodyHeight, unitWidth, -bodyHeight);
+
+    // Position de la baseLine
+    g.push();
+    displayLabel(ctx, 'baseLine', baseLine);
+    g.strokeWeight(2);
+    g.line(0, baseLine, unitWidth, baseLine);
+    g.pop();
+
+    // Position de la hauteur d'x du carractère
+    displayLabel(ctx, 'xHeight', xHeight);
+    g.line(0, xHeight, unitWidth, xHeight);
 
     g.pop();
+  }
+
+  function displayLabel(ctx, str, y, x = 0) {
+    const g = ctx || window;
+    push();
+    g.textSize(12);
+    g.noStroke();
+    g.fill(c.primary);
+    g.text(str, 4, y - 4);
+    pop();
   }
 
   return {
