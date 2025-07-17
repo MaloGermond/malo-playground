@@ -1,5 +1,5 @@
 // Il faut un autre nom de rule car c'est trop generique
-// Architecture, Structure, Config, Properties ...
+// Architecture, Structure, Config, metrics ...
 // Il faut que ca qualifie les guides et info sur la font
 
 export function fontRule({
@@ -24,11 +24,12 @@ export function fontRule({
     light: '#FBB2EA',
   };
 
-  const properties = computeRules(props);
-  const typeface = [];
-  console.log({ properties });
+  let metrics;
 
-  function computeRules(props) {
+  defineMetrics(props);
+  const typeface = [];
+
+  function defineMetrics(props) {
     // Ne pas oublier que l'origine est en haut à gauche. On dessine tout à "l'envert"
 
     // Réglage de la largeur.
@@ -86,12 +87,14 @@ export function fontRule({
       stemContrast: stemContrast,
     };
 
+    metrics = rules;
+
     return rules;
   }
 
   function drawGuides({ ctx = null } = {}) {
     const g = ctx || window;
-    const { x, y, unitWidth, bodyHeight, baseLine, ascender, xHeight, anchor } = properties;
+    const { x, y, unitWidth, bodyHeight, baseLine, ascender, xHeight, anchor } = metrics;
 
     g.push();
     g.noFill();
@@ -151,7 +154,7 @@ export function fontRule({
   }
 
   function drawChar(label, cat) {
-    const { x, y, unitWidth, bodyHeight, anchor } = properties;
+    const { x, y, unitWidth, bodyHeight, anchor } = metrics;
     const char = typeface.filter((el) => el.cat === cat).filter((el) => el.label === label)[0];
     const forms = char.radicals;
 
@@ -165,8 +168,8 @@ export function fontRule({
     forms.map((el) => {
       const position = anchor[el.position];
       const shape = el.shape;
-      const width = el.width({ ...properties });
-      const height = el.height({ ...properties });
+      const width = el.width({ ...metrics });
+      const height = el.height({ ...metrics });
       const pinned = el.pinned;
       radicals({ position, pinned, shape, width, height });
     });
@@ -175,6 +178,7 @@ export function fontRule({
 
   return {
     ...props,
+    defineMetrics,
     addType,
     drawGuides,
     drawChar,

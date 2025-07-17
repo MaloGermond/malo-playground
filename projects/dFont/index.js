@@ -62,7 +62,7 @@ const typeface = {
   },
 };
 
-let letters = fontRule({ x: 100, y: 100, width: 300, height: 600 });
+const letters = fontRule({ x: 100, y: 100, width: 300, height: 600 });
 
 window.setup = function () {
   createCanvas(config.width, config.height);
@@ -75,14 +75,14 @@ window.setup = function () {
         pinned: { x: 'CENTER', y: 'TOP' },
         shape: 'RECT',
         width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
-        height: ({ centerY, stem }) => centerY - stem / 2,
+        height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
       },
       {
         position: 'BOTTOM',
         pinned: { x: 'CENTER', y: 'BOTTOM' },
         shape: 'RECT',
         width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
-        height: ({ centerY, stem }) => centerY - stem / 2,
+        height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
       },
     ],
   });
@@ -92,28 +92,15 @@ window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
 
   if (mouseIsPressed) {
-    letters = fontRule({ x: 100, y: 100, width: mouseX, height: mouseY, contrast: 0.1 });
-    letters.addType({
-      cat: 'uppercase',
-      label: 'h',
-      radicals: [
-        {
-          position: 'TOP',
-          pinned: { x: 'CENTER', y: 'TOP' },
-          shape: 'RECT',
-          width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
-          height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
-        },
-        {
-          position: 'BOTTOM',
-          pinned: { x: 'CENTER', y: 'BOTTOM' },
-          shape: 'RECT',
-          width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
-          height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
-        },
-      ],
+    letters.defineMetrics({
+      x: 100,
+      y: 100,
+      width: mouseX,
+      height: mouseY,
+      contrast: 0.1,
+      stem: 20,
     });
   }
   letters.drawChar('h', 'uppercase');
-  letters.drawGuides();
+  // letters.drawGuides();
 };
