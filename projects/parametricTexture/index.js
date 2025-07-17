@@ -19,7 +19,7 @@ window.draw = function () {
   // console.log(field.getWindmap());
   field.getGrid().map((cell) => {
     const f = field.getWindForceAt(cell.center.x, cell.center.y);
-    const d = map(f.angle, -PI, PI, 2, 10@);
+    const d = map(f.angle, -PI, PI, 2, 10);
     displayHash(cell.x, cell.y, cell.width, cell.height, d, f.angle);
   });
 };
