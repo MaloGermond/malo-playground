@@ -40,15 +40,23 @@ const config = {
 };
 
 const typeface = {
-  capital: {
+  uppercase: {
     h: [
       {
         position: 'TOP',
         direction: 'DOWN',
-        anchor: 'TOP',
-        shape: 'rect',
-        width: 'unit - 2*stem',
-        height: 'centerY - stem/2',
+        reference: 'TOP',
+        shape: 'RECT',
+        width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+        height: ({ centerY, stem }) => centerY - stem / 2,
+      },
+      {
+        position: 'BOTTOM',
+        direction: 'UP',
+        reference: 'BOTTOM',
+        shape: 'RECT',
+        width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+        height: ({ centerY, stem }) => centerY - stem / 2,
       },
     ],
   },
@@ -58,13 +66,54 @@ let letters = fontRule({ x: 100, y: 100, width: 300, height: 600 });
 
 window.setup = function () {
   createCanvas(config.width, config.height);
+  letters.addType({
+    cat: 'uppercase',
+    label: 'h',
+    radicals: [
+      {
+        position: 'TOP',
+        pinned: { x: 'CENTER', y: 'TOP' },
+        shape: 'RECT',
+        width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+        height: ({ centerY, stem }) => centerY - stem / 2,
+      },
+      {
+        position: 'BOTTOM',
+        pinned: { x: 'CENTER', y: 'BOTTOM' },
+        shape: 'RECT',
+        width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+        height: ({ centerY, stem }) => centerY - stem / 2,
+      },
+    ],
+  });
 };
 
 window.draw = function () {
   background('#F3F9F7'); // Ajout d'un fond pour éviter les traînées
 
   if (mouseIsPressed) {
-    letters = fontRule({ x: 100, y: 100, width: mouseX, height: mouseY });
+    letters = fontRule({ x: 100, y: 100, width: mouseX, height: mouseY, contrast: 0.1 });
+    letters.addType({
+      cat: 'uppercase',
+      label: 'h',
+      radicals: [
+        {
+          position: 'TOP',
+          pinned: { x: 'CENTER', y: 'TOP' },
+          shape: 'RECT',
+          width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+          height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
+        },
+        {
+          position: 'BOTTOM',
+          pinned: { x: 'CENTER', y: 'BOTTOM' },
+          shape: 'RECT',
+          width: ({ unitWidth, stem }) => unitWidth - 2 * stem,
+          height: ({ centerY, stemContrast }) => centerY - stemContrast / 2,
+        },
+      ],
+    });
   }
+  letters.drawChar('h', 'uppercase');
   letters.drawGuides();
 };
