@@ -5,6 +5,8 @@ const settings = {
   strokeSize: 4,
 };
 
+let isMouseOverGUI = false;
+
 let points = new Array();
 const drawPath = spline();
 const drawing = [];
@@ -16,7 +18,7 @@ window.setup = function () {
 
 window.draw = function () {
   background(color('#F3F9F7'));
-  if (mouseIsPressed) {
+  if (mouseIsPressed && !isMouseOverGUI) {
     // addPoint(mouseX, mouseY, 50);
     drawPath.add({ x: mouseX, y: mouseY });
   }
@@ -50,6 +52,9 @@ window.mousePressed = function () {
 function loadGUI() {
   const GUI = lil.GUI;
   const gui = new GUI();
+
+  gui.domElement.addEventListener('mouseenter', () => (isMouseOverGUI = true));
+  gui.domElement.addEventListener('mouseleave', () => (isMouseOverGUI = false));
 
   gui.title('Stroke Control');
 
