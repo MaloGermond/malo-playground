@@ -1,6 +1,11 @@
 export default function spline({ points = [], resolution = 5 } = {}) {
 	let type = 'curve'; // ou 'polyline' etc. (extensible)
 
+	let properties = {
+		stroke: '#000',
+		weight: 4,
+	};
+
 	function add(point) {
 		if (points.length >= 1) {
 			const distance = dist(
@@ -31,12 +36,29 @@ export default function spline({ points = [], resolution = 5 } = {}) {
 		points = [];
 	}
 
+	function setStyle({ weight, stroke }) {
+		properties = { weight, stroke };
+	}
+
+	function getStyle() {
+		return properties;
+	}
+
 	function setType(newType) {
 		type = newType;
 	}
 
 	function getType() {
 		return type;
+	}
+
+	function clone() {
+		const copy = spline();
+		for (let p of points) {
+			copy.add({ x: p.x, y: p.y });
+		}
+		copy.setStyle({ ...properties });
+		return copy;
 	}
 
 	// Position sur la courbe à t ∈ [0, 1]
@@ -89,7 +111,11 @@ export default function spline({ points = [], resolution = 5 } = {}) {
 
 	// Draw
 
-	function draw({ weight = 3, fillColor = false, strokeColor = '#000' } = {}) {
+	function draw({
+		weight = properties.weight,
+		fillColor = false,
+		strokeColor = properties.stroke,
+	} = {}) {
 		fillColor ? fill(fillColor) : noFill();
 		strokeColor ? stroke(strokeColor) : noStroke();
 		strokeWeight(weight);
@@ -151,6 +177,8 @@ export default function spline({ points = [], resolution = 5 } = {}) {
 		add,
 		updatePoint,
 		removePoint,
+		setStyle,
+		getStyle,
 		getPoints,
 		getPointAt,
 		getPath,
@@ -161,5 +189,6 @@ export default function spline({ points = [], resolution = 5 } = {}) {
 		getType,
 		draw,
 		drawCurve,
+		clone,
 	};
 }

@@ -1,10 +1,17 @@
 import spline from './splineForge.js';
 
+const settings = {
+  strokeColor: '#46384c',
+  strokeSize: 4,
+};
+
 let points = new Array();
 const drawPath = spline();
+const drawing = [];
 
 window.setup = function () {
   createCanvas(windowWidth, windowHeight);
+  loadGUI();
 };
 
 window.draw = function () {
@@ -14,7 +21,18 @@ window.draw = function () {
     drawPath.add({ x: mouseX, y: mouseY });
   }
 
-  drawPath.draw({ weight: 20 });
+  push();
+  noFill();
+  stroke('#F00');
+  strokeWeight(1);
+  circle(mouseX, mouseY, settings.strokeSize, settings.strokeSize);
+  pop();
+  drawing.map((el) => {
+    el.draw();
+  });
+
+  drawPath.setStyle({ weight: settings.strokeSize, stroke: settings.strokeColor });
+  drawPath.draw();
 
   // if (points.length > 60) {
   //   points = points.slice(1);
@@ -24,8 +42,20 @@ window.draw = function () {
 };
 
 window.mousePressed = function () {
+  drawing.push(drawPath.clone());
   drawPath.clear();
+  console.log(drawing);
 };
+
+function loadGUI() {
+  const GUI = lil.GUI;
+  const gui = new GUI();
+
+  gui.title('Stroke Control');
+
+  gui.addColor(settings, 'strokeColor').name('Stroke');
+  gui.add(settings, 'strokeSize', 0, 100).name('Size');
+}
 
 function addPoint(x, y, d) {
   const distance = dist(points[points.length - 1].x, points[points.length - 1].y, x, y);
