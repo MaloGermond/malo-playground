@@ -23,12 +23,6 @@ window.draw = function () {
     drawPath.add({ x: mouseX, y: mouseY });
   }
 
-  push();
-  noFill();
-  stroke('#F00');
-  strokeWeight(1);
-  circle(mouseX, mouseY, settings.strokeSize, settings.strokeSize);
-  pop();
   drawing.map((el) => {
     el.draw();
   });
@@ -36,11 +30,15 @@ window.draw = function () {
   drawPath.setStyle({ weight: settings.strokeSize, stroke: settings.strokeColor });
   drawPath.draw();
 
-  // if (points.length > 60) {
-  //   points = points.slice(1);
-  // }
-
-  // drawCurve(points, 20, 50, '#F3F9F7', '#3C615A');
+  if (!isMouseOverGUI) {
+    noCursor();
+    push();
+    noFill();
+    stroke('#F00');
+    strokeWeight(1);
+    circle(mouseX, mouseY, settings.strokeSize, settings.strokeSize);
+    pop();
+  }
 };
 
 window.mousePressed = function () {
