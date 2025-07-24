@@ -3,6 +3,13 @@ import spline from './splineForge.js';
 const settings = {
   strokeColor: '#46384c',
   strokeSize: 4,
+  mouseIsPressed:{
+    x:0,y:0
+  },
+  penPos:{
+    x:0,
+    y:0
+  }
 };
 
 let isMouseOverGUI = false;
@@ -18,10 +25,28 @@ window.setup = function () {
 
 window.draw = function () {
   background(color('#F3F9F7'));
+
+  // if(keyIsDown && keyCode ===91){
+  //   console.log("hello")
+  //   console.log(dist(settings.mouseIsPressed.x,settings.mouseIsPressed.y,mouseX.mouseY))
+  // }
+
+  settings.penPos = {x:mouseX,y:mouseY}
+
+  if(keyIsDown(91)){
+    const mouseDist = dist(settings.mouseIsPressed.x,settings.mouseIsPressed.y,mouseX,mouseY)
+    const penSize = map(mouseDist,0,1000,1,100,true)
+    newCurve()
+    settings.penPos = settings.mouseIsPressed
+    settings.strokeSize=penSize
+  }
+
   if (mouseIsPressed && !isMouseOverGUI) {
     // addPoint(mouseX, mouseY, 50);
     drawPath.add({ x: mouseX, y: mouseY });
   }
+
+  
 
   drawing.map((el) => {
     el.draw();
@@ -31,20 +56,24 @@ window.draw = function () {
   drawPath.draw();
 
   if (!isMouseOverGUI) {
-    noCursor();
+    noCursor( );
     push();
     noFill();
     stroke('#F00');
     strokeWeight(1);
-    circle(mouseX, mouseY, settings.strokeSize, settings.strokeSize);
+    circle(settings.penPos.x, settings.penPos.y, settings.strokeSize, settings.strokeSize);
     pop();
   }
 };
 
+window.keyPressed = function(){
+ settings.mouseIsPressed.x = mouseX
+ settings.mouseIsPressed.y = mouseY
+}
+
 window.mousePressed = function () {
-  drawing.push(drawPath.clone());
-  drawPath.clear();
-  console.log(drawing);
+  newCurve()
+
 };
 
 function loadGUI() {
@@ -60,50 +89,12 @@ function loadGUI() {
   gui.add(settings, 'strokeSize', 0, 100).name('Size');
 }
 
-function addPoint(x, y, d) {
-  const distance = dist(points[points.length - 1].x, points[points.length - 1].y, x, y);
-  if (distance > d) {
-    points.push(createVector(x, y));
+
+function newCurve(){
+  if(drawPath.getPoints().length>10){
+    console.log(drawPath.getPoints().length)
+    drawing.push(drawPath.clone());
+    drawPath.clear();
   }
-}
-function drawCurve(points, swStart, swEnd, cStart, cEnd) {
-  noFill();
-  strokeWeight(swStart);
-  stroke(cStart);
-  curve(
-    points[0].x,
-    points[0].y,
-    points[0].x,
-    points[0].y,
-    points[1].x,
-    points[1].y,
-    points[2].x,
-    points[2].y
-  );
-  for (let p = 0; p < points.length - 3; p++) {
-    const progress = strokeWeight(map(p, 0, points.length - 3, swStart, swEnd));
-    stroke(lerpColor(color(cStart), color(cEnd), map(p, 0, points.length - 3, 0, 1)));
-    curve(
-      points[p].x,
-      points[p].y,
-      points[p + 1].x,
-      points[p + 1].y,
-      points[p + 2].x,
-      points[p + 2].y,
-      points[p + 3].x,
-      points[p + 3].y
-    );
-  }
-  strokeWeight(swEnd);
-  stroke(cEnd);
-  curve(
-    points[points.length - 3].x,
-    points[points.length - 3].y,
-    points[points.length - 2].x,
-    points[points.length - 2].y,
-    points[points.length - 1].x,
-    points[points.length - 1].y,
-    points[points.length - 1].x,
-    points[points.length - 1].y
-  );
+  console.log(drawing);
 }
