@@ -35,7 +35,7 @@ window.draw = function () {
 
   if(keyIsDown(91)){
     const mouseDist = dist(settings.mouseIsPressed.x,settings.mouseIsPressed.y,mouseX,mouseY)
-    const penSize = map(mouseDist,0,1000,1,100,true)
+    const penSize = round(map(mouseDist,0,1000,1,100,true))
     newCurve()
     settings.penPos = settings.mouseIsPressed
     settings.strokeSize=penSize
@@ -86,7 +86,7 @@ function loadGUI() {
   gui.title('Stroke Control');
 
   gui.addColor(settings, 'strokeColor').name('Stroke');
-  gui.add(settings, 'strokeSize', 0, 100).name('Size');
+  gui.add(settings, 'strokeSize', 0, 100).name('Size').listen();
 }
 
 
