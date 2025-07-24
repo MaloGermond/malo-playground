@@ -1,8 +1,8 @@
 import { windmap, wind } from '/libraries/windmap/index.js';
 
 const config = {
-  width: 500,
-  height: 500,
+  width: 540,
+  height: 540,
 };
 const field = windmap({ width: config.width, height: config.height, columns: 30, rows: 30 });
 
@@ -18,7 +18,7 @@ window.draw = function () {
   // field.displayWinds();
   // console.log(field.getWindmap());
 
-  field.setWinds(wind(300, 300, mouseX, mouseY))
+  field.setWinds(wind(10,20,20,400),wind(300, 300, mouseX, mouseY))
 
   field.getGrid().map((cell) => {
     const f = field.getWindForceAt(cell.center.x, cell.center.y);
