@@ -58,6 +58,15 @@ export const windmap = function (settings) {
 		return;
 	}
 
+	function setWinds(...args) {
+		// args est une liste de wind objects
+		const valid = args.filter(
+			w => w && typeof w.magnitude === 'number' && !isNaN(w.magnitude)
+		);
+		config.winds.length = 0;
+		config.winds.push(...valid);
+	}
+
 	function computeWindmap(grids, winds) {
 		const windmap = grids.map((cell) => {
 			return resolveWindEffect(cell.center.x, cell.center.y, winds);
@@ -182,6 +191,7 @@ export const windmap = function (settings) {
 	return {
 		init,
 		addWind,
+		setWinds,
 		generateGrid,
 		computeWindmap,
 		getWindForceAt,
@@ -194,3 +204,21 @@ export const windmap = function (settings) {
 		distancePointToSegment,
 	};
 };
+
+export const wind = function (x1, y1, x2, y2) {
+	const dx = x2 - x1;
+	const dy = y2 - y1;
+	const magnitude = Math.sqrt(dx * dx + dy * dy);
+	const vector = { x: dx, y: dy };
+	const direction = { x: dx / magnitude, y: dy / magnitude };
+	const angle = Math.atan2(direction.y, direction.x);
+
+	return {
+		start: { x: x1, y: y1 },
+		end: { x: x2, y: y2 },
+		vector,
+		direction,
+		magnitude,
+		angle,
+	};
+}

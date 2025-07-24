@@ -1,4 +1,4 @@
-import { windmap } from '/libraries/windmap/index.js';
+import { windmap, wind } from '/libraries/windmap/index.js';
 
 const config = {
   width: 500,
@@ -17,6 +17,9 @@ window.draw = function () {
   // field.displayGrid();
   // field.displayWinds();
   // console.log(field.getWindmap());
+
+  field.setWinds(wind(300, 300, mouseX, mouseY))
+
   field.getGrid().map((cell) => {
     const f = field.getWindForceAt(cell.center.x, cell.center.y);
     const d = map(f.angle, -PI, PI, 2, 10);
@@ -45,12 +48,12 @@ function displayHash(x, y, width, height, density, angle) {
   pop();
 }
 
-let newVectorWind = {};
-window.mousePressed = function () {
-  newVectorWind = createVector(mouseX, mouseY);
-};
+// let newVectorWind = {};
+// window.mousePressed = function () {
+//   newVectorWind = createVector(mouseX, mouseY);
+// };
 
-window.mouseReleased = function () {
-  field.addWind(newVectorWind.x, newVectorWind.y, mouseX, mouseY);
-  field.init();
-};
+// window.mouseReleased = function () {
+//   field.addWind(newVectorWind.x, newVectorWind.y, mouseX, mouseY);
+//   field.init();
+// };
