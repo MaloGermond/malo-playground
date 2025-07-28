@@ -8,7 +8,7 @@ const config = {
 const field = windmap({ width: config.width, height: config.height, columns: 50, rows: 30 });
 const bubble = particuleSystem({
   lifespan: 500,
-  speedLimit: 20,
+  friction: 10,
   boundary: { width: config.width, height: config.height, behaviour: 'wrap', x: 0, y: 0 },
   getForce: (x, y) => {
     const force = field.getWindForceAt(x, y);
