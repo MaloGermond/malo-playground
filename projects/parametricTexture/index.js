@@ -10,15 +10,23 @@ const canvas = {
 const config = {
   width: 300,
   height: 300,
-  x: 100,
-  y: 100,
+  x: 120,
+  y: 120,
   minDef: 1,
   maxDef: 5,
   magMax: 20,
 };
 
+const settings = {
+  followMouse: true,
+  mouse: {
+    px: 0, // Previous mouse position
+    py: 0,
+  },
+};
+
 // Et un autre champs pour l'affichage
-const field = windmap({ width: config.width, height: config.height, columns: 30, rows: 30 });
+const field = windmap({ width: config.width, height: config.height, columns: 20, rows: 20 });
 
 // Il y a un champs pour le déplacement des points
 const bubblesField = windmap({
@@ -36,8 +44,8 @@ const bubble = particuleSystem({
     width: config.width,
     height: config.height,
     behaviour: 'wrap',
-    x: config.x,
-    y: config.y,
+    x: 0,
+    y: 0,
   },
   getForce: (x, y) => {
     const force = bubblesField.getWindForceAt(x, y);
@@ -55,7 +63,7 @@ window.setup = function () {
     random(config.y, config.height)
   );
   bubblesField.init();
-  // resetWinds(6);
+  resetWinds(6);
 };
 
 window.draw = function () {
@@ -63,30 +71,23 @@ window.draw = function () {
 
   translate(config.x, config.y);
   push();
-  bubblesField.displayGrid();
-  bubblesField.displayWinds();
-  bubblesField.displayWindmap();
+  // bubblesField.displayGrid();
+  // bubblesField.displayWinds();
+  // bubblesField.displayWindmap();
 
-  bubble.update();
+  // bubble.update();
 
-  bubble.draw((el) => {
-    const size = map(el.life, 0, 500, 100, 0);
-    fill('#9CACDF');
-    ellipse(el.x, el.y, 10, 10);
-  });
-  // displayParametricTexture();
+  // bubble.draw((el) => {
+  //   const size = map(el.life, 0, 500, 100, 0);
+  //   fill('#9CACDF');
+  //   ellipse(el.x, el.y, 10, 10);
+  // });
+  displayParametricTexture();
   pop();
+  displayDragMouse();
 };
 
-const winds = [];
-const posWindMouse = { x: 0, y: 0 };
-
 window.keyPressed = function () {
-  if (key === 'r') {
-    posWindMouse.x = mouseX - config.x;
-    posWindMouse.y = mouseY - config.y;
-  }
-
   if (key === 'n') {
     resetWinds();
   }
@@ -101,29 +102,64 @@ window.keyPressed = function () {
     bubblesField.init();
   }
   if (key === 'b') {
-    bubble.add(mouseX - config.x, mouseY - config.y);
+    bubble.add(settings.mouse.px, settings.mouse.py);
   }
 };
 
+window.mousePressed = function () {
+  settings.mouse.px = mouseX;
+  settings.mouse.py = mouseY;
+};
+//
+// Relative Mouse Management
+//
+
+function relativeCanvas(x = mouseX, y = mouseY) {
+  return { x: x - config.x, y: y - config.y };
+}
+
+//
+//  Winds management
+//
+
+function displayDragMouse() {
+  if (!mouseIsPressed) {
+    return;
+  }
+  // console.log(mousePressed());
+  const { px, py } = settings.mouse;
+
+  const previous = relativeCanvas(px, py);
+  const current = relativeCanvas();
+  push();
+  stroke(0);
+  line(previous.x, previous.y, current.x, current.y);
+  pop();
+}
+
 function resetWinds(length = 4) {
-  winds.length = 0;
+  const winds = [];
   for (let i = 0; i < length; i++) {
     winds.push(
       wind(
-        random(0, window.width),
-        random(0, window.height),
-        random(0, window.width),
-        random(0, window.height)
+        random(config.x, config.width),
+        random(config.y, config.height),
+        random(config.x, config.width),
+        random(config.y, config.height)
       )
     );
   }
+
+  if (settings.followMouse) {
+    field.setWinds([...winds, wind(settings.mouse.px, settings.mouse.py, mouseX, mouseY)]);
+  } else {
+    field.setWinds(winds);
+  }
+
+  field.init();
 }
 
 function displayParametricTexture() {
-  const f = [...winds, wind(posWindMouse.x, posWindMouse.y, mouseX - config.x, mouseY - config.y)];
-  // const f= [...winds]
-  field.setWinds(...f);
-
   // console.log(winds)
 
   field.getGrid().map((cell) => {
@@ -140,7 +176,7 @@ function displayParametricTexture() {
 
   // field.displayWindmap();
   // field.displayGrid();
-  // field.displayWinds();
+  field.displayWinds();
   // console.log(field.getWindmap());
 }
 
