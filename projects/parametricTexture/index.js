@@ -15,18 +15,19 @@ const config = {
   minDef: 1,
   maxDef: 5,
   magMax: 20,
+  winds: [],
 };
 
 const settings = {
-  followMouse: true,
+  followMouse: false,
   mouse: {
-    px: 0, // Previous mouse position
-    py: 0,
+    px: undefined, // Previous mouse position
+    py: undefined,
   },
 };
 
 // Et un autre champs pour l'affichage
-const field = windmap({ width: config.width, height: config.height, columns: 20, rows: 20 });
+const field = windmap({ width: config.width, height: config.height, columns: 10, rows: 60 });
 
 // Il y a un champs pour le déplacement des points
 const bubblesField = windmap({
@@ -63,7 +64,7 @@ window.setup = function () {
     random(config.y, config.height)
   );
   bubblesField.init();
-  resetWinds(6);
+  resetWinds(0);
 };
 
 window.draw = function () {
@@ -89,7 +90,10 @@ window.draw = function () {
 
 window.keyPressed = function () {
   if (key === 'n') {
-    resetWinds();
+    resetWinds(6);
+  }
+  if (key === 'r') {
+    resetWinds(0);
   }
 
   if (key === 'B') {
@@ -110,6 +114,21 @@ window.mousePressed = function () {
   settings.mouse.px = mouseX;
   settings.mouse.py = mouseY;
 };
+
+window.mouseReleased = function () {
+  if (!settings.mouse.px && !settings.mouse.py) return;
+
+  const { px, py } = settings.mouse;
+
+  const previous = relativeCanvas(px, py);
+  const current = relativeCanvas();
+
+  if (!settings.followMouse) {
+    field.addWind(previous.x, previous.y, current.x, current.y);
+    field.init();
+  }
+};
+
 //
 // Relative Mouse Management
 //
@@ -126,7 +145,6 @@ function displayDragMouse() {
   if (!mouseIsPressed) {
     return;
   }
-  // console.log(mousePressed());
   const { px, py } = settings.mouse;
 
   const previous = relativeCanvas(px, py);
@@ -138,7 +156,8 @@ function displayDragMouse() {
 }
 
 function resetWinds(length = 4) {
-  const winds = [];
+  const { winds } = config;
+  winds.length = 0;
   for (let i = 0; i < length; i++) {
     winds.push(
       wind(
@@ -150,25 +169,26 @@ function resetWinds(length = 4) {
     );
   }
 
-  if (settings.followMouse) {
-    field.setWinds([...winds, wind(settings.mouse.px, settings.mouse.py, mouseX, mouseY)]);
-  } else {
-    field.setWinds(winds);
-  }
-
+  field.setWinds(...winds);
   field.init();
 }
 
 function displayParametricTexture() {
   // console.log(winds)
 
+  if (settings.followMouse) {
+    const current = relativeCanvas();
+    field.setWinds(wind(config.width / 2, config.height / 2, current.x, current.y));
+    field.init();
+  }
+
   field.getGrid().map((cell) => {
     const f = field.getWindForceAt(cell.center.x, cell.center.y);
     const d = map(f.angle, -PI, PI, 0, 1);
 
-    displayHash(cell.x, cell.y, cell.width, cell.height, f, f.angle);
+    // displayHash(cell.x, cell.y, cell.width, cell.height, f, f.angle);
 
-    // displayColorDots(cell.x, cell.y, cell.width, cell.height, f, f.angle);
+    displayColorDots(cell.x, cell.y, cell.width, cell.height, f, f.angle);
     // displayColorRect(cell.x, cell.y, cell.width, cell.height, f, f.angle)
   });
 
@@ -176,7 +196,7 @@ function displayParametricTexture() {
 
   // field.displayWindmap();
   // field.displayGrid();
-  field.displayWinds();
+
   // console.log(field.getWindmap());
 }
 
@@ -187,7 +207,7 @@ function displayColorDots(x, y, width, height, force, angle) {
   rotate(angle);
 
   const offset = map(force.magnitude, 0, config.magMax, 0, width / 3, true);
-  const size = map(force.magnitude, 0, config.magMax, width / 4, width, true);
+  const size = map(force.magnitude, config.magMax, 0, width / 8, width, true);
 
   fill(255, 0, 0);
   circle(0, offset, size, size);

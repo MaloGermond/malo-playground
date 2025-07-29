@@ -155,3 +155,11 @@ export function randomHex() {
   // Pad the color with zeros if needed
   return `#${randomColor.padStart(6, '0')}`;
 }
+
+//
+//  GESTURES
+//
+
+export function longPress() {
+  // TO DO
+}

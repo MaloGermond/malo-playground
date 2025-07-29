@@ -60,9 +60,7 @@ export const windmap = function (settings) {
 
 	function setWinds(...args) {
 		// args est une liste de wind objects
-		const valid = args.filter(
-			w => w && typeof w.magnitude === 'number' && !isNaN(w.magnitude)
-		);
+		const valid = args.filter((w) => w && typeof w.magnitude === 'number' && !isNaN(w.magnitude));
 		config.winds.length = 0;
 		config.winds.push(...valid);
 	}
@@ -221,4 +219,4 @@ export const wind = function (x1, y1, x2, y2) {
 		magnitude,
 		angle,
 	};
-}
+};
