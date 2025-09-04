@@ -19,7 +19,7 @@ const config = {
 };
 
 const settings = {
-  followMouse: false,
+  followMouse: true,
   mouse: {
     px: undefined, // Previous mouse position
     py: undefined,
@@ -27,7 +27,7 @@ const settings = {
 };
 
 // Et un autre champs pour l'affichage
-const field = windmap({ width: config.width, height: config.height, columns: 10, rows: 60 });
+const field = windmap({ width: config.width, height: config.height, columns: 30, rows: 20 });
 
 // Il y a un champs pour le déplacement des points
 const bubblesField = windmap({
@@ -57,12 +57,12 @@ const bubble = particuleSystem({
 window.setup = function () {
   createCanvas(canvas.width, canvas.height);
 
-  bubblesField.addWind(
-    random(config.x, config.width),
-    random(config.y, config.height),
-    random(config.x, config.width),
-    random(config.y, config.height)
-  );
+  // bubblesField.addWind(
+  //   random(config.x, config.width),
+  //   random(config.y, config.height),
+  //   random(config.x, config.width),
+  //   random(config.y, config.height)
+  // );
   bubblesField.init();
   resetWinds(0);
 };
@@ -74,16 +74,16 @@ window.draw = function () {
   push();
   // bubblesField.displayGrid();
   // bubblesField.displayWinds();
-  // bubblesField.displayWindmap();
+  bubblesField.displayWindmap();
 
-  // bubble.update();
+  bubble.update();
 
-  // bubble.draw((el) => {
-  //   const size = map(el.life, 0, 500, 100, 0);
-  //   fill('#9CACDF');
-  //   ellipse(el.x, el.y, 10, 10);
-  // });
-  displayParametricTexture();
+  bubble.draw((el) => {
+    const size = map(el.life, 0, 500, 100, 0);
+    fill('#9CACDF');
+    ellipse(el.x, el.y, 10, 10);
+  });
+  // displayParametricTexture();
   pop();
   displayDragMouse();
 };
@@ -96,7 +96,7 @@ window.keyPressed = function () {
     resetWinds(0);
   }
 
-  if (key === 'B') {
+  if (key === 'b') {
     bubblesField.addWind(
       random(0, config.width),
       random(0, config.height),
@@ -105,8 +105,8 @@ window.keyPressed = function () {
     );
     bubblesField.init();
   }
-  if (key === 'b') {
-    bubble.add(settings.mouse.px, settings.mouse.py);
+  if (key === ' ') {
+    bubble.add(relativeCanvas(mouseX, mouseY).x, relativeCanvas(mouseX, mouseY).y);
   }
 };
 
@@ -124,8 +124,8 @@ window.mouseReleased = function () {
   const current = relativeCanvas();
 
   if (!settings.followMouse) {
-    field.addWind(previous.x, previous.y, current.x, current.y);
-    field.init();
+    bubblesField.addWind(previous.x, previous.y, current.x, current.y);
+    bubblesField.init();
   }
 };
 
@@ -209,13 +209,13 @@ function displayColorDots(x, y, width, height, force, angle) {
   const offset = map(force.magnitude, 0, config.magMax, 0, width / 3, true);
   const size = map(force.magnitude, config.magMax, 0, width / 8, width, true);
 
-  fill(255, 0, 0);
+  fill('#00F6FF');
   circle(0, offset, size, size);
 
-  fill(0, 0, 255);
+  fill('#F600FF');
   circle(0, -offset, size, size);
 
-  fill(255, 0, 0, 125);
+  fill('#00F6FF80');
   circle(0, offset, size, size);
 
   pop();
