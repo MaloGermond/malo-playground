@@ -19,6 +19,7 @@ window.draw = function () {
   1 // Alpha
 ]);
   myShader.setUniform('time', millis());
+  myShader.setUniform('aPosition', mouseX);
   
   plane(100, 100,100,100);
 };
